@@ -110,7 +110,7 @@ export default function Onboarding() {
       </div>
 
       {/* Floating Centered Container Card */}
-      <div className="relative w-full h-full md:h-auto md:max-w-sm md:rounded-[32px] pt-12 pb-6 px-6 md:p-6 flex flex-col justify-between md:min-h-[580px] z-10 bg-transparent md:glass md:border md:border-foreground/10 md:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)]">
+      <div className="relative w-[calc(100%-32px)] xs:w-[360px] md:max-w-sm h-auto min-h-[480px] md:min-h-[540px] max-h-[92dvh] rounded-[32px] p-6 flex flex-col justify-between z-10 glass border border-foreground/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)]">
         {/* Top Header */}
         <div className="flex items-center justify-between shrink-0">
           <button
