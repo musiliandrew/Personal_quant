@@ -178,9 +178,12 @@ export const api = {
     }
   },
 
-  async uploadStatement(file: File): Promise<any> {
+  async uploadStatement(file: File, password?: string): Promise<any> {
     const formData = new FormData();
     formData.append("file", file);
+    if (password) {
+      formData.append("password", password);
+    }
 
     try {
       return await apiFetch<any>("/statements/upload", {
@@ -476,9 +479,12 @@ export const api = {
     });
   },
 
-  async uploadStatementGuest(file: File): Promise<any> {
+  async uploadStatementGuest(file: File, password?: string): Promise<any> {
     const formData = new FormData();
     formData.append("file", file);
+    if (password) {
+      formData.append("password", password);
+    }
     return await apiFetch<any>("/statements/upload-guest", {
       method: "POST",
       body: formData,

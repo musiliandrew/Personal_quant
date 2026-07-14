@@ -40,6 +40,10 @@ export default function UploadPage() {
   const [current, setCurrent] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+  const [pdfPassword, setPdfPassword] = useState("");
+  const [isIncorrectPassword, setIsIncorrectPassword] = useState(false);
 
   // Guest parser response states
   const [guestInsights, setGuestInsights] = useState<InsightItem[] | null>(null);
@@ -159,17 +163,27 @@ export default function UploadPage() {
     return () => clearTimeout(t);
   }, [processing, current]);
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: File, password?: string) => {
     setErrorMsg(null);
     setProcessing(true);
     setCurrent(0);
+    setPdfFile(file);
 
     try {
-      const response = await api.uploadStatementGuest(file);
+      const response = await api.uploadStatementGuest(file, password);
       if (response && response.error) {
-        setErrorMsg(response.error);
+        if (response.code === "PASSWORD_REQUIRED" || response.code === "INVALID_PASSWORD") {
+          setShowPasswordPrompt(true);
+          setIsIncorrectPassword(response.code === "INVALID_PASSWORD");
+          setErrorMsg(null);
+        } else {
+          setErrorMsg(response.error);
+        }
         setProcessing(false);
       } else {
+        setShowPasswordPrompt(false);
+        setIsIncorrectPassword(false);
+        setPdfPassword("");
         // Fast forward animations to end
         setCurrent(steps.length);
         setTimeout(() => {
@@ -180,7 +194,12 @@ export default function UploadPage() {
       }
     } catch (err: any) {
       console.error("Upload error:", err);
-      setErrorMsg(err.message || "Failed to upload statement.");
+      if (err.message && (err.message.includes("password") || err.message.includes("encrypted") || err.code === "PASSWORD_REQUIRED" || err.code === "INVALID_PASSWORD")) {
+        setShowPasswordPrompt(true);
+        setIsIncorrectPassword(err.message.includes("Incorrect") || err.code === "INVALID_PASSWORD");
+      } else {
+        setErrorMsg(err.message || "Failed to upload statement.");
+      }
       setProcessing(false);
     }
   };
@@ -356,65 +375,131 @@ export default function UploadPage() {
             <div className="flex-1 flex flex-col justify-center my-6">
               <AnimatePresence mode="wait">
                 {!processing ? (
-                  <motion.div
-                    key="picker"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex flex-col text-center items-center"
-                  >
-                    <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-foreground">
-                      Sign Your Quant.
-                    </h1>
-                    <p className="mt-2.5 text-[13px] text-muted-foreground font-semibold px-2">
-                      Buy that phone, fund that trip, or grow your savings. We show you exactly how to get there.
-                    </p>
-
-                    {errorMsg && (
-                      <div className="mt-4 w-full rounded-xl bg-destructive/10 p-3 text-[12px] text-destructive font-bold flex justify-between items-center">
-                        <span>{errorMsg}</span>
-                        <button onClick={() => setErrorMsg(null)}><X className="h-3.5 w-3.5" /></button>
-                      </div>
-                    )}
-
-                    <div
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragging(true);
-                      }}
-                      onDragLeave={() => setDragging(false)}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        setDragging(false);
-                        const file = e.dataTransfer.files?.[0];
-                        if (file) handleFileUpload(file);
-                      }}
-                      className={`glass mt-6 w-full rounded-[24px] p-6 text-center border border-dashed border-foreground/15 transition-all ${dragging ? "scale-[1.02] ring-2 ring-foreground/20" : ""}`}
+                  showPasswordPrompt ? (
+                    <motion.div
+                      key="password-prompt"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.4 }}
+                      className="flex flex-col text-center items-center w-full"
                     >
-                      <motion.div
-                        animate={{ y: [0, -4, 0] }}
-                        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                        className="mx-auto grid h-12 w-12 place-items-center rounded-xl text-foreground shrink-0"
-                        style={{ background: "var(--gradient-sky)" }}
-                      >
-                        <FileUp className="h-5 w-5" strokeWidth={1.8} />
-                      </motion.div>
-                      <p className="mt-3.5 text-[14px] font-bold">Drop M-Pesa PDF</p>
-                      <p className="mt-0.5 text-[11.5px] text-muted-foreground font-semibold">or</p>
-                      <button
-                        onClick={triggerPicker}
-                        className="mt-2.5 rounded-full bg-foreground px-5 py-2 text-[12px] font-bold text-background active:scale-95 transition-transform"
-                      >
-                        Select File
-                      </button>
-                    </div>
+                      <h1 className="text-[24px] font-semibold leading-tight tracking-tight text-foreground">
+                        Locked Statement.
+                      </h1>
+                      <p className="mt-2.5 text-[12.5px] text-muted-foreground font-semibold px-2">
+                        This M-Pesa statement is password-protected. Email statements are locked using your National ID, Passport, or Phone Number.
+                      </p>
 
-                    <div className="mt-5 rounded-2xl bg-foreground/[0.03] p-3 text-[11px] leading-relaxed text-muted-foreground font-semibold flex gap-2.5 items-start text-left">
-                      <FileText className="h-4 w-4 text-foreground/65 shrink-0 mt-0.5" />
-                      <p>Your data is processed strictly in-memory. Nothing is saved until you pay and secure your retainer.</p>
-                    </div>
-                  </motion.div>
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (pdfFile && pdfPassword.trim()) {
+                            handleFileUpload(pdfFile, pdfPassword);
+                          }
+                        }}
+                        className="mt-6 w-full space-y-4 text-left"
+                      >
+                        <div>
+                          <input
+                            type="password"
+                            placeholder="Enter statement password"
+                            value={pdfPassword}
+                            onChange={(e) => setPdfPassword(e.target.value)}
+                            className={`w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 border ${isIncorrectPassword ? "border-destructive/50" : "border-foreground/10"}`}
+                            autoFocus
+                          />
+                          {isIncorrectPassword && (
+                            <p className="mt-1.5 text-[11px] text-destructive font-bold pl-1">
+                              Incorrect password. Please try again.
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowPasswordPrompt(false);
+                              setPdfFile(null);
+                              setPdfPassword("");
+                              setIsIncorrectPassword(false);
+                            }}
+                            className="flex-1 rounded-full bg-foreground/[0.05] hover:bg-foreground/[0.08] py-2.5 text-[12px] font-bold text-foreground transition-transform active:scale-95"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="flex-1 rounded-full bg-foreground py-2.5 text-[12px] font-bold text-background transition-transform active:scale-95"
+                            disabled={!pdfPassword.trim()}
+                          >
+                            Unlock PDF
+                          </button>
+                        </div>
+                      </form>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="picker"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.4 }}
+                      className="flex flex-col text-center items-center"
+                    >
+                      <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-foreground">
+                        Sign Your Quant.
+                      </h1>
+                      <p className="mt-2.5 text-[13px] text-muted-foreground font-semibold px-2">
+                        Buy that phone, fund that trip, or grow your savings. We show you exactly how to get there.
+                      </p>
+
+                      {errorMsg && (
+                        <div className="mt-4 w-full rounded-xl bg-destructive/10 p-3 text-[12px] text-destructive font-bold flex justify-between items-center">
+                          <span>{errorMsg}</span>
+                          <button onClick={() => setErrorMsg(null)}><X className="h-3.5 w-3.5" /></button>
+                        </div>
+                      )}
+
+                      <div
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setDragging(true);
+                        }}
+                        onDragLeave={() => setDragging(false)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setDragging(false);
+                          const file = e.dataTransfer.files?.[0];
+                          if (file) handleFileUpload(file);
+                        }}
+                        className={`glass mt-6 w-full rounded-[24px] p-6 text-center border border-dashed border-foreground/15 transition-all ${dragging ? "scale-[1.02] ring-2 ring-foreground/20" : ""}`}
+                      >
+                        <motion.div
+                          animate={{ y: [0, -4, 0] }}
+                          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                          className="mx-auto grid h-12 w-12 place-items-center rounded-xl text-foreground shrink-0"
+                          style={{ background: "var(--gradient-sky)" }}
+                        >
+                          <FileUp className="h-5 w-5" strokeWidth={1.8} />
+                        </motion.div>
+                        <p className="mt-3.5 text-[14px] font-bold">Drop M-Pesa PDF</p>
+                        <p className="mt-0.5 text-[11.5px] text-muted-foreground font-semibold">or</p>
+                        <button
+                          onClick={triggerPicker}
+                          className="mt-2.5 rounded-full bg-foreground px-5 py-2 text-[12px] font-bold text-background active:scale-95 transition-transform"
+                        >
+                          Select File
+                        </button>
+                      </div>
+
+                      <div className="mt-5 rounded-2xl bg-foreground/[0.03] p-3 text-[11px] leading-relaxed text-muted-foreground font-semibold flex gap-2.5 items-start text-left">
+                        <FileText className="h-4 w-4 text-foreground/65 shrink-0 mt-0.5" />
+                        <p>Your data is processed strictly in-memory. Nothing is saved until you pay and secure your retainer.</p>
+                      </div>
+                    </motion.div>
+                  )
                 ) : (
                   <motion.div
                     key="processing"
