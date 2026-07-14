@@ -497,7 +497,7 @@ export default function UploadPage() {
               </button>
             </div>
 
-            <div className="w-full flex-1 min-h-0 grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div className="w-full flex-1 min-h-0 flex flex-col md:grid md:grid-cols-5 gap-6">
               {/* Left Side: 3 Insights and masked stats */}
               <div className={`md:col-span-3 flex-col gap-3.5 md:gap-5 flex-1 min-h-0 ${activeTab === "summary" ? "flex" : "hidden md:flex"}`}>
                 <div className="flex flex-col shrink-0">
