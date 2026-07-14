@@ -100,7 +100,7 @@ export default function Onboarding() {
 
   return (
     <main
-      className="relative h-screen w-full overflow-hidden flex items-center justify-center p-0 md:p-4"
+      className="relative h-dvh w-full overflow-hidden flex items-center justify-center p-0 md:p-4"
       style={{ background: "var(--gradient-hero)" }}
     >
       {/* Ambient Orbs */}
@@ -110,7 +110,7 @@ export default function Onboarding() {
       </div>
 
       {/* Floating Centered Container Card */}
-      <div className="relative w-full h-full md:h-auto md:max-w-sm md:rounded-[32px] p-6 flex flex-col justify-between md:min-h-[580px] z-10 bg-transparent md:glass md:border md:border-foreground/10 md:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)]">
+      <div className="relative w-full h-full md:h-auto md:max-w-sm md:rounded-[32px] pt-12 pb-6 px-6 md:p-6 flex flex-col justify-between md:min-h-[580px] z-10 bg-transparent md:glass md:border md:border-foreground/10 md:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)]">
         {/* Top Header */}
         <div className="flex items-center justify-between shrink-0">
           <button
@@ -137,7 +137,7 @@ export default function Onboarding() {
         </div>
 
         {/* Content Slides */}
-        <div className="flex-1 flex flex-col justify-center my-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col justify-center my-3 overflow-y-auto min-h-0">
           <AnimatePresence mode="wait">
 
             {/* ── Step 0: Security ── */}
@@ -148,13 +148,13 @@ export default function Onboarding() {
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col text-center"
               >
-                <div className="mx-auto mb-4 relative flex h-14 w-14 items-center justify-center rounded-[20px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
+                <div className="mx-auto mb-3 relative flex h-12 w-12 items-center justify-center rounded-[18px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
                   <div className="absolute inset-0 opacity-30 blur-lg" style={{ background: "var(--gradient-sky)" }} />
-                  <ShieldCheck className="h-6 w-6 text-foreground relative z-10" strokeWidth={1.8} />
+                  <ShieldCheck className="h-5 w-5 text-foreground relative z-10" strokeWidth={1.8} />
                 </div>
-                <h1 className="text-[24px] font-semibold leading-tight tracking-tight">Your finances.<br />Strictly private.</h1>
-                <p className="mt-2 text-[13px] text-muted-foreground font-semibold px-2">Quant protects your statements on-device.</p>
-                <div className="mt-6 space-y-3.5 text-left">
+                <h1 className="text-[21px] md:text-[24px] font-semibold leading-tight tracking-tight">Your finances.<br />Strictly private.</h1>
+                <p className="mt-1.5 text-[12.5px] text-muted-foreground font-semibold px-2">Quant protects your statements on-device.</p>
+                <div className="mt-4 space-y-2.5 text-left">
                   {[
                     [Lock, "AES-256 local file encryption"],
                     [EyeOff, "No selling or model-training"],
@@ -164,7 +164,7 @@ export default function Onboarding() {
                       <span className="grid h-7 w-7 place-items-center rounded-lg bg-foreground/[0.04] text-muted-foreground shrink-0">
                         <Icon className="h-3.5 w-3.5" />
                       </span>
-                      <span className="text-[13px] font-semibold">{text as string}</span>
+                      <span className="text-[12.5px] font-semibold">{text as string}</span>
                     </div>
                   ))}
                 </div>
@@ -179,13 +179,13 @@ export default function Onboarding() {
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col"
               >
-                <div className="mx-auto mb-4 relative flex h-14 w-14 items-center justify-center rounded-[20px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
+                <div className="mx-auto mb-3 relative flex h-12 w-12 items-center justify-center rounded-[18px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
                   <div className="absolute inset-0 opacity-30 blur-lg" style={{ background: "var(--gradient-lilac)" }} />
-                  <Cpu className="h-6 w-6 text-foreground relative z-10" strokeWidth={1.8} />
+                  <Cpu className="h-5 w-5 text-foreground relative z-10" strokeWidth={1.8} />
                 </div>
-                <h1 className="text-center text-[24px] font-semibold leading-tight tracking-tight">How it works.</h1>
-                <p className="mt-2 text-center text-[13px] text-muted-foreground font-semibold px-2">Building your private Financial Twin.</p>
-                <div className="mt-6 relative border-l border-foreground/10 pl-5 ml-3 space-y-4">
+                <h1 className="text-center text-[21px] md:text-[24px] font-semibold leading-tight tracking-tight">How it works.</h1>
+                <p className="mt-1.5 text-center text-[12.5px] text-muted-foreground font-semibold px-2">Building your private Financial Twin.</p>
+                <div className="mt-4 relative border-l border-foreground/10 pl-5 ml-3 space-y-3.5">
                   {[
                     ["Set your Survival Pack", "Declare your fixed essential costs."],
                     ["Upload statement", "Drop your M-Pesa PDF file."],
@@ -194,8 +194,8 @@ export default function Onboarding() {
                   ].map(([title, sub], i) => (
                     <div key={i} className="relative">
                       <span className="absolute -left-[27px] top-0.5 grid h-4.5 w-4.5 place-items-center rounded-full bg-foreground text-background text-[9px] font-bold">{i + 1}</span>
-                      <h3 className="text-[13px] font-bold">{title}</h3>
-                      <p className="text-[11.5px] text-muted-foreground font-semibold">{sub}</p>
+                      <h3 className="text-[12.5px] font-bold">{title}</h3>
+                      <p className="text-[11px] text-muted-foreground font-semibold leading-tight">{sub}</p>
                     </div>
                   ))}
                 </div>
@@ -210,40 +210,40 @@ export default function Onboarding() {
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="relative flex h-12 w-12 items-center justify-center rounded-[18px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
+                <div className="flex items-center gap-3 mb-2.5">
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
                     <div className="absolute inset-0 opacity-30 blur-lg" style={{ background: "var(--gradient-mint)" }} />
-                    <Package className="h-5 w-5 text-foreground relative z-10" strokeWidth={1.8} />
+                    <Package className="h-4.5 w-4.5 text-foreground relative z-10" strokeWidth={1.8} />
                   </div>
                   <div>
-                    <h1 className="text-[20px] font-semibold leading-tight tracking-tight">Survival Pack</h1>
-                    <p className="text-[12px] text-muted-foreground font-semibold">Your non-negotiable monthly essentials</p>
+                    <h1 className="text-[18px] md:text-[20px] font-semibold leading-tight tracking-tight">Survival Pack</h1>
+                    <p className="text-[11px] text-muted-foreground font-semibold">Your non-negotiable monthly essentials</p>
                   </div>
                 </div>
 
-                <div className="space-y-2 max-h-[340px] overflow-y-auto pr-0.5">
+                <div className="space-y-1.5 max-h-[200px] xs:max-h-[230px] md:max-h-[300px] overflow-y-auto pr-0.5">
                   {survivalItems.map((item, idx) => {
                     const preset = SURVIVAL_PRESETS.find((p) => p.label === item.label);
                     return (
                       <div key={idx} className="flex items-center gap-2">
-                        <div className="flex-1 glass rounded-xl flex items-center gap-2 px-3 py-2.5">
+                        <div className="flex-1 glass rounded-xl flex items-center gap-2 px-3 py-2">
                           {(() => {
                             const IconComponent = preset?.icon || Tag;
-                            return <IconComponent className="h-4 w-4 text-muted-foreground shrink-0" />;
+                            return <IconComponent className="h-3.5 w-3.5 text-muted-foreground shrink-0" />;
                           })()}
-                          <span className="text-[12.5px] font-semibold flex-1 truncate">{item.label}</span>
-                          <span className="text-[11px] text-muted-foreground font-bold shrink-0">KSh</span>
+                          <span className="text-[12px] font-semibold flex-1 truncate">{item.label}</span>
+                          <span className="text-[10px] text-muted-foreground font-bold shrink-0">KSh</span>
                           <input
                             type="number"
                             value={item.amount}
                             onChange={(e) => handleSurvivalAmount(idx, e.target.value)}
                             placeholder={preset?.placeholder || "0"}
-                            className="w-20 text-right bg-transparent text-[13px] font-bold outline-none"
+                            className="w-20 text-right bg-transparent text-[12px] font-bold outline-none"
                           />
                         </div>
                         {!preset && (
-                          <button onClick={() => removeItem(idx)} className="shrink-0 grid h-8 w-8 place-items-center rounded-full bg-foreground/[0.04] hover:bg-destructive/10">
-                            <X className="h-3.5 w-3.5 text-muted-foreground" />
+                          <button onClick={() => removeItem(idx)} className="shrink-0 grid h-7 w-7 place-items-center rounded-full bg-foreground/[0.04] hover:bg-destructive/10">
+                            <X className="h-3 w-3 text-muted-foreground" />
                           </button>
                         )}
                       </div>
@@ -251,22 +251,22 @@ export default function Onboarding() {
                   })}
 
                   {/* Add custom item */}
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex gap-2 pt-0.5">
                     <input
                       value={customLabel}
                       onChange={(e) => setCustomLabel(e.target.value)}
                       placeholder="Add custom (e.g. Gym)"
-                      className="flex-1 glass rounded-xl px-3 py-2.5 text-[12.5px] outline-none"
+                      className="flex-1 glass rounded-xl px-3 py-2 text-[12px] outline-none"
                     />
                     <input
                       type="number"
                       value={customAmount}
                       onChange={(e) => setCustomAmount(e.target.value)}
                       placeholder="Amount"
-                      className="w-24 glass rounded-xl px-3 py-2.5 text-[12.5px] text-right outline-none"
+                      className="w-20 glass rounded-xl px-3 py-2 text-[12px] text-right outline-none"
                     />
-                    <button onClick={addCustomItem} className="shrink-0 grid h-10 w-10 place-items-center rounded-xl bg-foreground text-background">
-                      <Plus className="h-4 w-4" />
+                    <button onClick={addCustomItem} className="shrink-0 grid h-8 w-8 place-items-center rounded-xl bg-foreground text-background">
+                      <Plus className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
@@ -275,13 +275,13 @@ export default function Onboarding() {
                 {totalSurvival > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                    className="mt-3 glass rounded-2xl px-4 py-3 flex items-center justify-between"
+                    className="mt-2.5 glass rounded-xl px-3.5 py-2.5 flex items-center justify-between"
                   >
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Monthly Baseline</p>
-                      <p className="text-[20px] font-bold tracking-tight mt-0.5">{fmt(totalSurvival)}</p>
+                      <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Monthly Baseline</p>
+                      <p className="text-[17px] font-bold tracking-tight mt-0.5">{fmt(totalSurvival)}</p>
                     </div>
-                    <Sparkles className="h-5 w-5 text-emerald-400" />
+                    <Sparkles className="h-4.5 w-4.5 text-emerald-400" />
                   </motion.div>
                 )}
               </motion.div>
@@ -295,45 +295,45 @@ export default function Onboarding() {
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col text-center"
               >
-                <div className="mx-auto mb-4 relative flex h-14 w-14 items-center justify-center rounded-[20px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
+                <div className="mx-auto mb-3 relative flex h-12 w-12 items-center justify-center rounded-[18px] overflow-hidden bg-foreground/[0.03] border border-foreground/10 shrink-0">
                   <div className="absolute inset-0 opacity-30 blur-lg" style={{ background: "var(--gradient-mint)" }} />
-                  <Compass className="h-6 w-6 text-foreground relative z-10" strokeWidth={1.8} />
+                  <Compass className="h-5 w-5 text-foreground relative z-10" strokeWidth={1.8} />
                 </div>
-                <h1 className="text-[24px] font-semibold leading-tight tracking-tight">You are in control.</h1>
-                <p className="mt-2 text-[13px] text-muted-foreground font-semibold px-2">Choose how your statement is kept.</p>
+                <h1 className="text-[21px] md:text-[24px] font-semibold leading-tight tracking-tight">You are in control.</h1>
+                <p className="mt-1.5 text-[12.5px] text-muted-foreground font-semibold px-2">Choose how your statement is kept.</p>
 
-                <div className="mt-6 rounded-2xl bg-foreground/[0.03] p-4 text-left flex flex-col gap-3">
+                <div className="mt-4 rounded-xl bg-foreground/[0.03] p-3 text-left flex flex-col gap-2.5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      <h4 className="text-[13px] font-bold">Delete after processing</h4>
-                      <p className="text-[11px] text-muted-foreground font-semibold mt-0.5 leading-tight">
+                      <h4 className="text-[12.5px] font-bold">Delete after processing</h4>
+                      <p className="text-[10.5px] text-muted-foreground font-semibold mt-0.5 leading-tight">
                         Discards raw PDFs once twin metrics are built.
                       </p>
                     </div>
                     <button
                       onClick={() => setDeleteAfter((v) => !v)}
-                      className={`relative h-6 w-10.5 rounded-full transition-colors shrink-0 ${deleteAfter ? "bg-foreground" : "bg-foreground/15"}`}
+                      className={`relative h-5.5 w-9.5 rounded-full transition-colors shrink-0 ${deleteAfter ? "bg-foreground" : "bg-foreground/15"}`}
                       aria-pressed={deleteAfter}
                     >
                       <motion.span
                         layout
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-background shadow ${deleteAfter ? "left-[18px]" : "left-0.5"}`}
+                        className={`absolute top-0.5 h-4.5 w-4.5 rounded-full bg-background shadow ${deleteAfter ? "left-[16px]" : "left-0.5"}`}
                       />
                     </button>
                   </div>
-                  <div className="border-t border-foreground/5 pt-2.5 text-[11px] text-muted-foreground font-semibold leading-relaxed">
+                  <div className="border-t border-foreground/5 pt-2 text-[10.5px] text-muted-foreground font-semibold leading-relaxed">
                     You can clear all twins, goals, and conversations from settings anytime.
                   </div>
                 </div>
 
                 {/* Survival pack recap */}
                 {totalSurvival > 0 && (
-                  <div className="mt-4 glass rounded-2xl p-4 text-left flex gap-3 items-start">
-                    <TrendingDown className="h-5 w-5 text-sky-400 shrink-0 mt-0.5" />
+                  <div className="mt-3.5 glass rounded-xl p-3 text-left flex gap-2.5 items-start">
+                    <TrendingDown className="h-4.5 w-4.5 text-sky-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-[12px] font-bold">Survival pack saved</p>
-                      <p className="text-[11.5px] text-muted-foreground font-semibold mt-0.5">
+                      <p className="text-[11.5px] font-bold">Survival pack saved</p>
+                      <p className="text-[11px] text-muted-foreground font-semibold mt-0.5 leading-tight">
                         Baseline: <span className="text-foreground font-bold">{fmt(totalSurvival)}/mo</span>. Quant will compare this against your statement to find leakages.
                       </p>
                     </div>
