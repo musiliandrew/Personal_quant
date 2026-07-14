@@ -317,7 +317,7 @@ export default function UploadPage() {
         <div className="absolute bottom-1/4 -right-32 h-[450px] w-[450px] rounded-full opacity-[0.35] blur-3xl" style={{ background: "var(--gradient-mint)" }} />
       </div>
 
-      <div className="relative w-full max-w-4xl z-10 flex flex-col items-center gap-4 md:gap-6 flex-1 h-0">
+      <div className="relative w-full max-w-4xl z-10 flex flex-col items-center gap-4 md:gap-6 flex-1 min-h-0">
         {/* Brand Logo Header */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -476,7 +476,7 @@ export default function UploadPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full flex-1 flex flex-col h-0 z-10"
+            className="w-full flex-1 flex flex-col min-h-0 z-10"
           >
             {/* Mobile Tab Selector */}
             <div className="flex md:hidden w-full glass rounded-full p-1 border border-foreground/5 mb-4 shrink-0">
@@ -628,7 +628,7 @@ export default function UploadPage() {
                         className={`flex flex-col max-w-[85%] ${msg.role === "USER" ? "ml-auto items-end" : "mr-auto items-start"}`}
                       >
                         <div
-                          className={`rounded-2xl px-3.5 py-2.5 text-[12px] leading-relaxed font-semibold ${msg.role === "USER" ? "bg-foreground text-background rounded-tr-none" : "glass border border-foreground/5 rounded-tl-none text-foreground"}`}
+                          className={`rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed font-medium ${msg.role === "USER" ? "bg-foreground text-background rounded-tr-none" : "glass border border-foreground/5 rounded-tl-none text-foreground"}`}
                           dangerouslySetInnerHTML={{
                             __html: displayContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                           }}
@@ -677,7 +677,7 @@ export default function UploadPage() {
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder={promptCount >= 1 ? "Prompt limit reached. Click to unlock." : "Ask your quant anything…"}
                       disabled={promptCount >= 1 || sendingChat}
-                      className={`flex-1 bg-transparent text-[12px] font-semibold outline-none py-1 text-foreground placeholder:text-muted-foreground/40 disabled:opacity-50 ${promptCount >= 1 ? "cursor-pointer" : ""}`}
+                      className={`flex-1 bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-1 text-foreground placeholder:text-muted-foreground/40 disabled:opacity-50 ${promptCount >= 1 ? "cursor-pointer" : ""}`}
                     />
                     <button
                       type="submit"
@@ -740,6 +740,7 @@ export default function UploadPage() {
                   )}
 
                   <form onSubmit={handleLoginSubmit} className="w-full space-y-2.5 text-left">
+
                     <div className="glass rounded-xl flex flex-col px-3 py-1 border border-foreground/5">
                       <label className="text-[8.5px] text-muted-foreground font-bold uppercase tracking-wider">Email Address</label>
                       <input
@@ -748,7 +749,7 @@ export default function UploadPage() {
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
                         placeholder="name@example.com"
-                        className="bg-transparent text-[12px] font-semibold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
+                        className="bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
                       />
                     </div>
 
@@ -761,7 +762,7 @@ export default function UploadPage() {
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="bg-transparent text-[12px] font-semibold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 flex-1"
+                          className="bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 flex-1"
                         />
                         <button
                           type="button"
@@ -909,7 +910,7 @@ export default function UploadPage() {
                         value={mpesaPhone}
                         onChange={(e) => setMpesaPhone(e.target.value)}
                         placeholder="e.g. 0712345678"
-                        className="bg-transparent text-[14px] font-bold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 mt-0.5"
+                        className="bg-transparent text-[16px] md:text-[14px] font-bold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 mt-0.5"
                       />
                     </div>
 
@@ -994,7 +995,7 @@ export default function UploadPage() {
                       value={signupName}
                       onChange={(e) => setSignupName(e.target.value)}
                       placeholder="Andrew Musili"
-                      className="bg-transparent text-[12px] font-semibold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
+                      className="bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
                     />
                   </div>
 
@@ -1006,7 +1007,7 @@ export default function UploadPage() {
                       value={signupEmail}
                       onChange={(e) => setSignupEmail(e.target.value)}
                       placeholder="andrew@quantiq.co.ke"
-                      className="bg-transparent text-[12px] font-semibold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
+                      className="bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
                     />
                   </div>
 
@@ -1019,7 +1020,7 @@ export default function UploadPage() {
                         value={signupPassword}
                         onChange={(e) => setSignupPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="bg-transparent text-[12px] font-semibold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 flex-1"
+                        className="bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 flex-1"
                       />
                       <button
                         type="button"
@@ -1044,9 +1045,10 @@ export default function UploadPage() {
                       value={signupConfirmPassword}
                       onChange={(e) => setSignupConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="bg-transparent text-[12px] font-semibold outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
+                      className="bg-transparent text-[16px] md:text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
                     />
                   </div>
+
 
                   <button
                     type="submit"
