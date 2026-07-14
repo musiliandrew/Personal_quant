@@ -2,7 +2,7 @@
   "name": "Quant Financial Intelligence",
   "short_name": "Quant",
   "description": "On-device private money intelligence twin.",
-  "start_url": "/upload",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
