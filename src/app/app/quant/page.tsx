@@ -137,6 +137,18 @@ function QuantPageContent() {
     window.dispatchEvent(event);
   }, [isDrawerOpen]);
 
+  useEffect(() => {
+    if (msgs.length > 0) {
+      const timer = setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [msgs]);
+
   const startNewChat = () => {
     setMsgs(getInitialMsgs(userName));
     setConversationId(null);
@@ -258,7 +270,7 @@ function QuantPageContent() {
         </div>
       </div>
 
-      <div className="mt-4 sm:mt-5 flex-1 space-y-3 pb-40">
+      <div className="mt-4 sm:mt-5 flex-1 space-y-3 pb-40 md:pb-48">
         {historyLoading ? (
           <div className="py-20 text-center space-y-3">
             <div className="h-6 w-6 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin mx-auto" />
