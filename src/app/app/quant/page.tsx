@@ -349,7 +349,7 @@ function QuantPageContent() {
       {/* ════════════════════════════════════════════════
           DESKTOP LAYOUT  (hidden on mobile)
       ═══════════════════════════════════════════════ */}
-      <div className="hidden md:flex h-[calc(100vh-80px)] gap-0 overflow-hidden rounded-3xl border border-foreground/[0.06] shadow-[0_8px_40px_-8px_rgba(0,0,0,0.25)]">
+      <div className="hidden md:flex h-[calc(100vh-120px)] gap-0 overflow-hidden rounded-3xl border border-foreground/[0.06] shadow-[0_8px_40px_-8px_rgba(0,0,0,0.25)]">
 
         {/* ── Left Panel: History Sidebar ──────────────── */}
         <AnimatePresence initial={false}>
@@ -357,7 +357,7 @@ function QuantPageContent() {
             <motion.aside
               key="history-sidebar"
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 280, opacity: 1 }}
+              animate={{ width: 240, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
               className="flex flex-col border-r border-foreground/[0.06] bg-background/30 backdrop-blur-xl overflow-hidden shrink-0"

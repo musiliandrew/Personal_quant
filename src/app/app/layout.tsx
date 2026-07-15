@@ -161,9 +161,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Dynamic Responsive wrapper for page content */}
         <div className={cn(
           "w-full",
-          // Quant chat page: full bleed on desktop, normal mobile padding
           pathname === "/app/quant"
-            ? "px-4 py-4 pb-32 md:px-4 md:py-4 md:pb-4"
+            ? "mx-auto max-w-md md:max-w-5xl px-4 py-4 pb-32 md:px-6 md:py-6 md:pb-6"
             : "mx-auto max-w-md md:max-w-4xl lg:max-w-5xl px-4 py-4 md:px-8 md:py-10 pb-32 md:pb-16"
         )}>
           {/* Desktop header greeting — hidden on quant chat page */}
