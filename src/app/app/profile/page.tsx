@@ -558,6 +558,13 @@ export default function ProfilePage() {
                         You have full control. You can use the "Delete All Data" action in the settings to instantly purge your profile, saved AI rules, and chat history.
                       </p>
                     </div>
+
+                    <div className="space-y-1">
+                      <p className="font-bold text-foreground text-[13px] sm:text-[14px]">5. Kenya Data Protection Act (DPA) 2019</p>
+                      <p>
+                        Quant fully complies with the Kenya Data Protection Act 2019. We process your mobile money and statement records strictly in accordance with Section 25 principles (lawful, fair, and transparent processing, data minimization, and robust technical security measures). You hold absolute rights to access, rectify, or request immediate deletion of your financial information.
+                      </p>
+                    </div>
                   </>
                 )}
               </div>
