@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   ArrowRight,
   ShieldCheck,
@@ -26,9 +26,30 @@ import { api } from "@/lib/api";
 
 const currency = (n: number) => `KSh ${n.toLocaleString("en-KE", { maximumFractionDigits: 0 })}`;
 
-export default function Landing() {
+function LandingContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeSheet, setActiveSheet] = useState<"simulator" | "quiz" | "chat" | "auth" | null>(null);
+
+  // On mount: bootstrap cookie for already-logged-in users and handle ?redirect
+  useEffect(() => {
+    const token = localStorage.getItem("quant_token");
+    if (token) {
+      // Ensure the auth cookie is set so middleware lets them through
+      if (!document.cookie.includes("quant_auth")) {
+        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = `quant_auth=1; path=/; expires=${expires}; SameSite=Strict`;
+      }
+      const dest = searchParams.get("redirect") || "/app";
+      router.replace(dest);
+      return;
+    }
+    // Not logged in but arrived via a ?redirect — auto-open sign-in sheet
+    if (searchParams.get("redirect")) {
+      setAuthMode("login");
+      setActiveSheet("auth");
+    }
+  }, []);
 
   // Auth States
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -830,5 +851,13 @@ export default function Landing() {
           )}
         </AnimatePresence>
     </main>
+  );
+}
+
+export default function Landing() {
+  return (
+    <Suspense fallback={null}>
+      <LandingContent />
+    </Suspense>
   );
 }
