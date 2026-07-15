@@ -14,8 +14,10 @@ import {
   CheckCircle2,
   Clock,
   Zap,
+  Lock,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import UpgradeModal from "@/components/UpgradeModal";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -312,15 +314,19 @@ export default function AnalysisPage() {
   const [monthly, setMonthly] = useState<{ months: MonthData[]; overall_summary: string } | null>(null);
   const [weekly, setWeekly]   = useState<{ weeks: WeekData[] } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPro, setIsPro] = useState<boolean | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.getMonthlyAnalysis(), api.getWeeklyAnalysis()])
-      .then(([m, w]) => {
+    Promise.all([api.getMonthlyAnalysis(), api.getWeeklyAnalysis(), api.getMe()])
+      .then(([m, w, user]) => {
         setMonthly(m);
         setWeekly(w);
+        setIsPro(user.is_pro);
       })
       .catch((err) => {
         console.error("Error loading analysis data:", err);
+        setIsPro(false);
       })
       .finally(() => {
         setLoading(false);
@@ -400,36 +406,88 @@ export default function AnalysisPage() {
             ))}
           </div>
         ) : tab === "monthly" ? (
-          monthly?.months.map((m, i) => (
-            <MonthCard key={m.month_key} data={m} index={i} />
-          ))
+          <>
+            {monthly?.months.slice(0, isPro ? undefined : 1).map((m, i) => (
+              <MonthCard key={m.month_key} data={m} index={i} />
+            ))}
+            {isPro === false && monthly?.months && monthly.months.length > 1 && (
+              <div className="relative mt-4 overflow-hidden rounded-[24px] border border-foreground/10 p-6 text-center bg-transparent glass flex flex-col items-center justify-center min-h-[220px]">
+                <div className="absolute inset-0 -z-10 bg-background/30 backdrop-blur-md" />
+                <div className="absolute inset-0 -z-20 bg-gradient-to-b from-transparent to-background/90" />
+                
+                <div className="relative z-10 flex flex-col items-center max-w-xs">
+                  <div className="h-10 w-10 rounded-full bg-purple-500/10 grid place-items-center mb-3">
+                    <Lock className="h-5 w-5 text-purple-400" />
+                  </div>
+                  <h3 className="text-[16px] font-bold text-foreground">Unlock Complete Analysis</h3>
+                  <p className="text-[11.5px] text-muted-foreground font-semibold mt-1 px-2">
+                    Get unlimited monthly history, deep weekly velocity trends, and AI cashflow forecasts.
+                  </p>
+                  <button
+                    onClick={() => setShowUpgrade(true)}
+                    className="mt-4 rounded-full bg-foreground text-background px-6 py-2.5 text-[12.5px] font-bold active:scale-95 transition-transform"
+                  >
+                    Upgrade to Quant Pro
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
-          weekly?.weeks.map((w, i) => (
-            <WeekCard key={w.week_start} data={w} index={i} />
-          ))
+          <>
+            {weekly?.weeks.slice(0, isPro ? undefined : 1).map((w, i) => (
+              <WeekCard key={w.week_start} data={w} index={i} />
+            ))}
+            {isPro === false && weekly?.weeks && weekly.weeks.length > 1 && (
+              <div className="relative mt-4 overflow-hidden rounded-[24px] border border-foreground/10 p-6 text-center bg-transparent glass flex flex-col items-center justify-center min-h-[220px]">
+                <div className="absolute inset-0 -z-10 bg-background/30 backdrop-blur-md" />
+                <div className="absolute inset-0 -z-20 bg-gradient-to-b from-transparent to-background/90" />
+                
+                <div className="relative z-10 flex flex-col items-center max-w-xs">
+                  <div className="h-10 w-10 rounded-full bg-purple-500/10 grid place-items-center mb-3">
+                    <Lock className="h-5 w-5 text-purple-400" />
+                  </div>
+                  <h3 className="text-[16px] font-bold text-foreground">Unlock Complete Analysis</h3>
+                  <p className="text-[11.5px] text-muted-foreground font-semibold mt-1 px-2">
+                    Get unlimited weekly breakdowns, cash velocity metrics, and automated alerts.
+                  </p>
+                  <button
+                    onClick={() => setShowUpgrade(true)}
+                    className="mt-4 rounded-full bg-foreground text-background px-6 py-2.5 text-[12.5px] font-bold active:scale-95 transition-transform"
+                  >
+                    Upgrade to Quant Pro
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Interactive Teach Quant Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mt-5 sm:mt-6 rounded-[20px] sm:rounded-[22px] border border-dashed border-purple-500/30 bg-purple-500/5 p-4 flex flex-col items-start justify-between gap-4"
-      >
-        <div>
-          <h4 className="text-[13px] sm:text-[14px] font-bold text-purple-300">Improve Analysis Accuracy</h4>
-          <p className="text-[11.5px] sm:text-[12px] text-muted-foreground mt-0.5 leading-snug">
-            Got uncategorized transactions or repeated peer-to-peer transfers? Teach Quant your custom merchant aliases.
-          </p>
-        </div>
-        <Link
-          href="/app/insights"
-          className="w-full text-center rounded-full bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 px-4 py-2.5 text-[12.5px] sm:text-[13px] font-bold transition-all active:scale-[0.98]"
+      {isPro !== false && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-5 sm:mt-6 rounded-[20px] sm:rounded-[22px] border border-dashed border-purple-500/30 bg-purple-500/5 p-4 flex flex-col items-start justify-between gap-4"
         >
-          Open Money Map & Label
-        </Link>
-      </motion.div>
+          <div>
+            <h4 className="text-[13px] sm:text-[14px] font-bold text-purple-300">Improve Analysis Accuracy</h4>
+            <p className="text-[11.5px] sm:text-[12px] text-muted-foreground mt-0.5 leading-snug">
+              Got uncategorized transactions or repeated peer-to-peer transfers? Teach Quant your custom merchant aliases.
+            </p>
+          </div>
+          <Link
+            href="/app/insights"
+            className="w-full text-center rounded-full bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 px-4 py-2.5 text-[12.5px] sm:text-[13px] font-bold transition-all active:scale-[0.98]"
+          >
+            Open Money Map & Label
+          </Link>
+        </motion.div>
+      )}
+
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} onSuccess={() => { setShowUpgrade(false); window.location.reload(); }} />
     </div>
   );
 }
