@@ -38,6 +38,7 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
   if (!response.ok) {
     let errMsg = `API error: ${response.status} ${response.statusText}`;
+    let errCode = undefined;
     try {
       const errJson = await response.json();
       if (errJson && errJson.error) {
@@ -45,8 +46,14 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
       } else if (errJson && errJson.detail) {
         errMsg = errJson.detail;
       }
+      if (errJson && errJson.code) {
+        errCode = errJson.code;
+      }
     } catch (_) {}
-    throw new Error(errMsg);
+    const error = new Error(errMsg) as any;
+    error.code = errCode;
+    error.status = response.status;
+    throw error;
   }
 
   return response.json() as Promise<T>;
