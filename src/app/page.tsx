@@ -365,16 +365,16 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Funnel iOS sheets (Bottom Drawers) */}
+        {/* Funnel iOS sheets (Bottom Drawers on Mobile, Centered Modals on Desktop) */}
         <AnimatePresence>
           {activeSheet && (
-            <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm">
+            <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm md:items-center p-4">
               <motion.div
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                exit={{ y: "100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 220 }}
-                className="glass-strong w-full max-w-md rounded-t-[32px] px-6 pt-5 pb-8 border-t border-foreground/[0.08] max-h-[85vh] overflow-y-auto text-foreground"
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 26, stiffness: 220 }}
+                className="glass-strong w-full max-w-md rounded-t-[32px] md:rounded-[28px] px-6 pt-5 pb-8 md:p-8 border-t md:border border-foreground/[0.08] max-h-[85vh] overflow-y-auto text-foreground md:shadow-2xl"
               >
                 {/* Drawer Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-foreground/[0.06]">
