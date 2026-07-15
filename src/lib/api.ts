@@ -486,31 +486,6 @@ export const api = {
     });
   },
 
-  async uploadStatementGuest(file: File, password?: string): Promise<any> {
-    const formData = new FormData();
-    formData.append("file", file);
-    if (password) {
-      formData.append("password", password);
-    }
-    return await apiFetch<any>("/statements/upload-guest", {
-      method: "POST",
-      body: formData,
-    });
-  },
-
-  async sendChatMessageGuest(message: string): Promise<any> {
-    return await apiFetch<any>("/quant/chat-guest", {
-      method: "POST",
-      body: JSON.stringify({ message }),
-    });
-  },
-
-  async checkoutBillingGuest(phoneNumber: string, amount?: number): Promise<any> {
-    return await apiFetch<any>("/auth/billing/checkout-guest/", {
-      method: "POST",
-      body: JSON.stringify({ phone_number: phoneNumber, amount }),
-    });
-  },
 
   async googleLogin(credential: string): Promise<any> {
     const res = await apiFetch<any>("/auth/google-login/", {
