@@ -20,18 +20,8 @@ export default function UploadPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Authentication & Session state
+  // Authentication status
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [authMode, setAuthMode] = useState<"signup" | "login">("signup");
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  // Form Fields
-  const [authName, setAuthName] = useState("");
-  const [authEmail, setAuthEmail] = useState("");
-  const [authPassword, setAuthPassword] = useState("");
-  const [authConfirmPassword, setAuthConfirmPassword] = useState("");
 
   // Upload state
   const [processing, setProcessing] = useState(false);
@@ -46,57 +36,12 @@ export default function UploadPage() {
   // Check auth status on mount
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
-    setIsAuthenticated(!!token);
-  }, []);
-
-  // Load Google Identity Services Script
-  useEffect(() => {
-    if (isAuthenticated !== false) return;
-
-    const initializeGoogleSignIn = () => {
-      if (typeof window !== "undefined" && (window as any).google) {
-        (window as any).google.accounts.id.initialize({
-          client_id: "120213766332-5aiu0t3t2e0psqjqvji6op0ds00greu2.apps.googleusercontent.com",
-          callback: handleGoogleCredentialResponse,
-        });
-        
-        const btnParent = document.getElementById("google-signin-btn-container");
-        if (btnParent) {
-          (window as any).google.accounts.id.renderButton(
-            btnParent,
-            { theme: "dark", size: "large", width: btnParent.clientWidth || 320, shape: "pill" }
-          );
-        }
-      }
-    };
-
-    const handleGoogleCredentialResponse = async (response: any) => {
-      setAuthError(null);
-      setAuthLoading(true);
-      try {
-        await api.googleLogin(response.credential);
-        setIsAuthenticated(true);
-      } catch (err: any) {
-        console.error("Google auth error:", err);
-        setAuthError(err.message || "Google authentication failed.");
-      } finally {
-        setAuthLoading(false);
-      }
-    };
-
-    const id = "google-gsi-client";
-    if (!document.getElementById(id)) {
-      const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.id = id;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeGoogleSignIn;
-      document.body.appendChild(script);
+    if (!token) {
+      router.push("/");
     } else {
-      initializeGoogleSignIn();
+      setIsAuthenticated(true);
     }
-  }, [isAuthenticated, authMode]);
+  }, []);
 
   // Parsing step loop animation
   useEffect(() => {
@@ -105,33 +50,6 @@ export default function UploadPage() {
     const t = setTimeout(() => setCurrent((c) => c + 1), 800);
     return () => clearTimeout(t);
   }, [processing, current]);
-
-  // Auth Form Handlers
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthLoading(true);
-    setAuthError(null);
-
-    if (authMode === "signup" && authPassword !== authConfirmPassword) {
-      setAuthError("Passwords do not match.");
-      setAuthLoading(false);
-      return;
-    }
-
-    try {
-      if (authMode === "login") {
-        await api.login(authEmail, authPassword);
-      } else {
-        await api.signup(authName, authEmail, authPassword);
-      }
-      setIsAuthenticated(true);
-    } catch (err: any) {
-      console.error("Auth error:", err);
-      setAuthError(err.message || "Authentication failed. Check your details.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
 
   // Authenticated Upload Handler
   const handleFileUpload = async (file: File, password?: string) => {
@@ -230,141 +148,8 @@ export default function UploadPage() {
         </div>
 
         <AnimatePresence mode="wait">
-          {/* 1. AUTHENTICATION SECTION (User must log in/register first) */}
-          {!isAuthenticated ? (
-            <motion.div
-              key="auth-card"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              className="relative w-full rounded-[32px] p-6 bg-transparent glass border border-foreground/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)]"
-            >
-              <div className="text-center flex flex-col items-center">
-                <h1 className="text-[20px] font-black tracking-tight leading-none text-foreground">
-                  {authMode === "signup" ? "Create Secure Account" : "Welcome Back"}
-                </h1>
-                <p className="mt-1.5 text-[11px] text-muted-foreground font-semibold px-2">
-                  {authMode === "signup" 
-                    ? "Set up your credentials to claim your private financial twin." 
-                    : "Sign in to access your secure statement upload vault."}
-                </p>
-
-                {authError && (
-                  <div className="mt-3 w-full rounded-xl bg-destructive/10 p-2.5 text-[11px] text-destructive font-bold flex justify-between items-center text-left">
-                    <span>{authError}</span>
-                    <button onClick={() => setAuthError(null)}><X className="h-3 w-3" /></button>
-                  </div>
-                )}
-
-                <form onSubmit={handleAuthSubmit} className="w-full mt-4 space-y-2.5 text-left">
-                  {authMode === "signup" && (
-                    <div className="glass rounded-xl flex flex-col px-3 py-1 border border-foreground/5">
-                      <label className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider">Full Name</label>
-                      <input
-                        type="text"
-                        required
-                        value={authName}
-                        onChange={(e) => setAuthName(e.target.value)}
-                        placeholder="Andrew Musili"
-                        className="bg-transparent text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
-                      />
-                    </div>
-                  )}
-
-                  <div className="glass rounded-xl flex flex-col px-3 py-1 border border-foreground/5">
-                    <label className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider">Email Address</label>
-                    <input
-                      type="email"
-                      required
-                      value={authEmail}
-                      onChange={(e) => setAuthEmail(e.target.value)}
-                      placeholder="name@example.com"
-                      className="bg-transparent text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
-                    />
-                  </div>
-
-                  <div className="glass rounded-xl flex flex-col px-3 py-1 border border-foreground/5">
-                    <label className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider">Password</label>
-                    <div className="flex items-center justify-between">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        required
-                        value={authPassword}
-                        onChange={(e) => setAuthPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="bg-transparent text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30 flex-1"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="text-muted-foreground hover:text-foreground p-0.5 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {authMode === "signup" && (
-                    <div className="glass rounded-xl flex flex-col px-3 py-1 border border-foreground/5">
-                      <label className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider">Confirm Password</label>
-                      <input
-                        type="password"
-                        required
-                        value={authConfirmPassword}
-                        onChange={(e) => setAuthConfirmPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="bg-transparent text-[14px] font-medium outline-none py-0.5 text-foreground placeholder:text-muted-foreground/30"
-                      />
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={authLoading}
-                    className="w-full rounded-full bg-foreground text-background py-3 font-bold text-[13px] transition-transform active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
-                  >
-                    {authLoading ? (
-                      <>
-                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                        Authenticating...
-                      </>
-                    ) : (
-                      authMode === "signup" ? "Create Account & Continue" : "Sign In & Continue"
-                    )}
-                  </button>
-                </form>
-
-                <div className="relative flex py-2 items-center w-full">
-                  <div className="flex-grow border-t border-foreground/5"></div>
-                  <span className="flex-shrink mx-2 text-[8px] text-muted-foreground font-black uppercase tracking-wider">Or</span>
-                  <div className="flex-grow border-t border-foreground/5"></div>
-                </div>
-
-                <div className="w-full flex justify-center mt-1">
-                  <div id="google-signin-btn-container" className="w-full min-h-[40px] flex justify-center" />
-                </div>
-
-                <div className="mt-4 text-[12px] text-muted-foreground font-semibold">
-                  {authMode === "signup" ? (
-                    <>
-                      Already have an account?{" "}
-                      <button onClick={() => { setAuthMode("login"); setAuthError(null); }} className="text-foreground hover:underline font-bold">
-                        Sign In
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      Don't have an account?{" "}
-                      <button onClick={() => { setAuthMode("signup"); setAuthError(null); }} className="text-foreground hover:underline font-bold">
-                        Create Account
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            /* 2. FILE UPLOADER SECTION */
+          {isAuthenticated && (
+            /* FILE UPLOADER SECTION */
             <motion.div
               key="upload-card"
               initial={{ opacity: 0, y: 12 }}
@@ -375,9 +160,9 @@ export default function UploadPage() {
               {/* Top Header */}
               <div className="flex items-center justify-between border-b border-foreground/[0.05] pb-3 mb-4">
                 <button
-                  onClick={() => setIsAuthenticated(false)}
+                  onClick={() => router.push("/")}
                   className="rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.08] grid h-9 w-9 place-items-center transition-transform active:scale-95 shrink-0"
-                  aria-label="Logout/Switch Account"
+                  aria-label="Back"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>

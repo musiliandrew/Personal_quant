@@ -5,8 +5,8 @@ import type { NextRequest } from "next/server";
  * Route Protection Middleware
  * Runs on the Edge before any page is rendered.
  *
- * Protected prefix: /app/*
- * Public routes:    / (landing), /onboarding, /upload (token checked client-side there)
+ * Protected paths:  /app/*, /upload, /onboarding
+ * Public routes:    / (landing)
  *
  * Token is stored in localStorage (client-only), so we can't read it here directly.
  * Instead we use a short-lived cookie "quant_auth" that the app sets on login
@@ -18,8 +18,13 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only protect /app/* routes
-  if (!pathname.startsWith("/app")) {
+  // Protect /app/*, /upload, /onboarding
+  const isProtected =
+    pathname.startsWith("/app") ||
+    pathname.startsWith("/upload") ||
+    pathname.startsWith("/onboarding");
+
+  if (!isProtected) {
     return NextResponse.next();
   }
 
@@ -35,5 +40,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/:path*"],
+  matcher: [
+    "/app/:path*",
+    "/upload/:path*",
+    "/upload",
+    "/onboarding/:path*",
+    "/onboarding",
+  ],
 };
