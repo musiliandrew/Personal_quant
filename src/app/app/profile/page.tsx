@@ -18,12 +18,14 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useTheme } from "@/components/ThemeProvider";
+import UpgradeModal from "@/components/UpgradeModal";
 
 const currency = (n: number) => `KSh ${n.toLocaleString("en-KE", { maximumFractionDigits: 0 })}`;
 
 export default function ProfilePage() {
   const { isDark: dark, setDark } = useTheme();
   const [isBillsOpen, setIsBillsOpen] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [bills, setBills] = useState<any[]>([]);
   const [loadingBills, setLoadingBills] = useState(true);
   
@@ -69,7 +71,7 @@ export default function ProfilePage() {
       .catch(() => setLoadingBills(false));
   };
 
-  const [userProfile, setUserProfile] = useState<{ name?: string; email?: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ name?: string; email?: string; isPro?: boolean } | null>(null);
   const [behaviour, setBehaviour] = useState<any>(null);
 
   useEffect(() => {
@@ -91,12 +93,20 @@ export default function ProfilePage() {
     }
 
     api.getDashboard().then((res) => {
-      setUserProfile({
+      setUserProfile((prev) => ({
+        ...prev,
         name: res.user_name,
         email: res.user_email,
-      });
+      }));
       setBehaviour(res.behaviour);
       localStorage.setItem("quant_dashboard", JSON.stringify(res));
+    }).catch(() => {});
+
+    api.getMe().then((res) => {
+      setUserProfile((prev) => ({
+        ...prev,
+        isPro: res.is_pro,
+      }));
     }).catch(() => {});
   }, []);
 
@@ -147,13 +157,31 @@ export default function ProfilePage() {
           {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : "U"}
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-[16px] sm:text-[18px] font-bold truncate">{userProfile?.name || "User"}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-[16px] sm:text-[18px] font-bold truncate">{userProfile?.name || "User"}</p>
+            {userProfile?.isPro !== undefined && (
+              userProfile.isPro ? (
+                <span className="inline-flex items-center text-[9px] font-extrabold bg-gradient-to-r from-purple-400 to-indigo-500 text-background px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 select-none">
+                  Pro
+                </span>
+              ) : (
+                <button
+                  onClick={() => setShowUpgrade(true)}
+                  className="inline-flex items-center text-[9px] font-extrabold bg-foreground/10 text-foreground hover:bg-foreground/15 px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 transition-colors"
+                >
+                  Free • Upgrade
+                </button>
+              )
+            )}
+          </div>
           <p className="text-[11.5px] sm:text-[12px] text-muted-foreground font-semibold truncate">{userProfile?.email || "Member since 2024"}</p>
         </div>
         <Link href="/" className="text-[11px] sm:text-[12px] text-muted-foreground font-bold shrink-0">
           Sign out
         </Link>
       </motion.div>
+
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} onSuccess={() => { setShowUpgrade(false); window.location.reload(); }} />
 
       {/* Quant Financial Persona (Wrapped / develops over time) */}
       <Section title="Quant Financial Persona">
