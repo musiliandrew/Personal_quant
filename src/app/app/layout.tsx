@@ -8,6 +8,7 @@ import { Home, BarChart2, Target, MessageCircle, User } from "lucide-react";
 import { Logo } from "@/components/quant/logo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { api } from "@/lib/api";
 
 type NavItem = { to: "/app" | "/app/goals" | "/app/quant" | "/app/profile" | "/app/analysis"; label: string; icon: typeof Home; exact?: boolean };
 const items: NavItem[] = [
@@ -32,6 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isAdmin = pathname.startsWith("/app/admin");
   const [userName, setUserName] = React.useState<string>("User");
   const [greeting, setGreeting] = useState(getGreeting());
+  const [isPro, setIsPro] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -47,6 +49,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           }
         } catch (_) {}
       }
+      // Fetch status
+      api.getMe().then((user) => {
+        setIsPro(user.is_pro);
+      }).catch(() => {});
     }
     // Recompute greeting every minute
     setGreeting(getGreeting());
@@ -104,7 +110,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {userName.slice(0, 2)}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-bold truncate text-foreground">{userName}</p>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <p className="text-[14px] font-bold truncate text-foreground">{userName}</p>
+                {isPro !== null && (
+                  <span className={cn(
+                    "text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0",
+                    isPro 
+                      ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
+                      : "bg-foreground/10 text-muted-foreground"
+                  )}>
+                    {isPro ? "Pro" : "Free"}
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] font-medium text-muted-foreground truncate">{greeting}</p>
             </div>
             <NotificationBell />
@@ -122,7 +140,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] sm:text-[13px] text-muted-foreground font-semibold">{greeting}</p>
-              <h1 className="text-[24px] sm:text-[28px] font-semibold tracking-tight">{userName}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-[24px] sm:text-[28px] font-semibold tracking-tight">{userName}</h1>
+                {isPro !== null && (
+                  <span className={cn(
+                    "text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 mt-1",
+                    isPro 
+                      ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
+                      : "bg-foreground/10 text-muted-foreground"
+                  )}>
+                    {isPro ? "Pro" : "Free"}
+                  </span>
+                )}
+              </div>
             </div>
             <NotificationBell />
           </div>
@@ -133,7 +163,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Desktop header greeting (visible only on desktop) */}
           <div className="hidden md:flex flex-col gap-0.5 mb-8">
             <p className="text-[12px] lg:text-[13px] text-muted-foreground font-semibold uppercase tracking-wider">{greeting}</p>
-            <h1 className="text-[28px] lg:text-[34px] font-black tracking-tight text-foreground">{userName}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-[28px] lg:text-[34px] font-black tracking-tight text-foreground">{userName}</h1>
+              {isPro !== null && (
+                <span className={cn(
+                  "text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shrink-0 mt-1",
+                  isPro 
+                    ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
+                    : "bg-foreground/10 text-muted-foreground"
+                )}>
+                  {isPro ? "Pro" : "Free"}
+                </span>
+              )}
+            </div>
           </div>
           
           {children}
