@@ -11,10 +11,12 @@ import UpgradeModal from "@/components/UpgradeModal";
 import { Logo } from "@/components/quant/logo";
 import { cn } from "@/lib/utils";
 
-const getInitialMsgs = (name = "Andrew"): Msg[] => [
+const getInitialMsgs = (name = "Andrew", hasData = false, txDays = 0): Msg[] => [
   {
     role: "quant",
-    text: `Hi ${name}. Ask me anything about your money — I've read the last 90 days of transactions.`,
+    text: hasData
+      ? `Hi ${name}. I've analysed your last ${txDays > 0 ? txDays : 90} days of transactions. Ask me anything about your money.`
+      : `Hi ${name}. I'm ready to be your personal financial analyst — but I haven't seen your data yet. Upload an M-Pesa statement to get started.`,
   },
 ];
 
@@ -109,14 +111,32 @@ function QuantPageContent() {
       try {
         const [convs] = await Promise.all([fetchConversations(), checkProStatus()]);
 
-        const cached = localStorage.getItem("quant_dashboard");
+        // Read cached dashboard to determine upload status
         let name = "Andrew";
+        let hasData = false;
+        let txDays = 0;
+
+        const cached = localStorage.getItem("quant_dashboard");
         if (cached) {
           try {
             const parsed = JSON.parse(cached);
             if (parsed.user_name) { name = parsed.user_name; setUserName(name); }
+            const income = parseFloat(String(parsed.monthly_income_30d || "0"));
+            const expenses = parseFloat(String(parsed.monthly_expenses_30d || "0"));
+            hasData = income > 0 || expenses > 0;
+            txDays = hasData ? 90 : 0;
           } catch (_) {}
         }
+
+        // Also try live fetch for freshest data
+        try {
+          const dash = await api.getDashboard();
+          if (dash.user_name) { name = dash.user_name; setUserName(name); }
+          const income = parseFloat(String(dash.monthly_income_30d || "0"));
+          const expenses = parseFloat(String(dash.monthly_expenses_30d || "0"));
+          hasData = income > 0 || expenses > 0;
+          txDays = hasData ? 90 : 0;
+        } catch (_) {}
 
         const q = searchParams.get("q");
 
@@ -125,7 +145,7 @@ function QuantPageContent() {
           await loadConversation(latestId);
           if (q) send(q, latestId);
         } else {
-          setMsgs(getInitialMsgs(name));
+          setMsgs(getInitialMsgs(name, hasData, txDays));
           if (q) send(q, null);
         }
       } catch (err) {
@@ -150,7 +170,18 @@ function QuantPageContent() {
   }, [msgs]);
 
   const startNewChat = () => {
-    setMsgs(getInitialMsgs(userName));
+    // Re-read data status from cache for new chat greeting
+    let hasData = false;
+    try {
+      const cached = localStorage.getItem("quant_dashboard");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        const income = parseFloat(String(parsed.monthly_income_30d || "0"));
+        const expenses = parseFloat(String(parsed.monthly_expenses_30d || "0"));
+        hasData = income > 0 || expenses > 0;
+      }
+    } catch (_) {}
+    setMsgs(getInitialMsgs(userName, hasData, hasData ? 90 : 0));
     setConversationId(null);
     setIsDrawerOpen(false);
   };
