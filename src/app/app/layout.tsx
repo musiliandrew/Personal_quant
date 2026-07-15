@@ -159,25 +159,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Dynamic Responsive wrapper for page content */}
-        <div className="mx-auto w-full max-w-md md:max-w-4xl lg:max-w-5xl px-4 py-4 md:px-8 md:py-10 pb-32 md:pb-16">
-          {/* Desktop header greeting (visible only on desktop) */}
-          <div className="hidden md:flex flex-col gap-0.5 mb-8">
-            <p className="text-[12px] lg:text-[13px] text-muted-foreground font-semibold uppercase tracking-wider">{greeting}</p>
-            <div className="flex items-center gap-3">
-              <h1 className="text-[28px] lg:text-[34px] font-black tracking-tight text-foreground">{userName}</h1>
-              {isPro !== null && (
-                <span className={cn(
-                  "text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shrink-0 mt-1",
-                  isPro 
-                    ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
-                    : "bg-foreground/10 text-muted-foreground"
-                )}>
-                  {isPro ? "Pro" : "Free"}
-                </span>
-              )}
+        <div className={cn(
+          "w-full",
+          // Quant chat page: full bleed on desktop, normal mobile padding
+          pathname === "/app/quant"
+            ? "px-4 py-4 pb-32 md:px-4 md:py-4 md:pb-4"
+            : "mx-auto max-w-md md:max-w-4xl lg:max-w-5xl px-4 py-4 md:px-8 md:py-10 pb-32 md:pb-16"
+        )}>
+          {/* Desktop header greeting — hidden on quant chat page */}
+          {pathname !== "/app/quant" && (
+            <div className="hidden md:flex flex-col gap-0.5 mb-8">
+              <p className="text-[12px] lg:text-[13px] text-muted-foreground font-semibold uppercase tracking-wider">{greeting}</p>
+              <div className="flex items-center gap-3">
+                <h1 className="text-[28px] lg:text-[34px] font-black tracking-tight text-foreground">{userName}</h1>
+                {isPro !== null && (
+                  <span className={cn(
+                    "text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shrink-0 mt-1",
+                    isPro
+                      ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                      : "bg-foreground/10 text-muted-foreground"
+                  )}>
+                    {isPro ? "Pro" : "Free"}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-          
+          )}
+
           {children}
         </div>
       </main>
