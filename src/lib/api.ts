@@ -59,6 +59,16 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
   return response.json() as Promise<T>;
 }
 
+/** Sync a lightweight presence cookie so Next.js middleware can gate /app/* routes. */
+function setAuthCookie() {
+  // 30-day expiry, SameSite=Strict, no sensitive value stored
+  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `quant_auth=1; path=/; expires=${expires}; SameSite=Strict`;
+}
+
+function clearAuthCookie() {
+  document.cookie = "quant_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict";
+}
 export interface DashboardData {
   user_name?: string;
   user_email?: string;
@@ -435,6 +445,7 @@ export const api = {
     });
     if (res.token) {
       localStorage.setItem("quant_token", res.token);
+      setAuthCookie();
     }
     return res;
   },
@@ -446,6 +457,7 @@ export const api = {
     });
     if (res.token) {
       localStorage.setItem("quant_token", res.token);
+      setAuthCookie();
     }
     return res;
   },
@@ -453,6 +465,7 @@ export const api = {
   async logout(): Promise<void> {
     localStorage.removeItem("quant_token");
     localStorage.removeItem("quant_dashboard");
+    clearAuthCookie();
   },
 
   async getNotifications(): Promise<any> {
@@ -495,6 +508,7 @@ export const api = {
     if (res.token) {
       localStorage.setItem("quant_token", res.token);
       localStorage.removeItem("quant_dashboard");
+      setAuthCookie();
     }
     return res;
   },

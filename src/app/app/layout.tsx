@@ -36,6 +36,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isPro, setIsPro] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // ── Auth guard (client-side, second layer after middleware) ──
+    const token = localStorage.getItem("quant_token");
+    if (!token && !isAdmin) {
+      const redirectPath = pathname !== "/" ? `?redirect=${encodeURIComponent(pathname)}` : "";
+      router.replace(`/${redirectPath}`);
+      return;
+    }
+
+    // Bootstrap cookie for existing sessions that pre-date middleware
+    if (token && !document.cookie.includes("quant_auth")) {
+      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+      document.cookie = `quant_auth=1; path=/; expires=${expires}; SameSite=Strict`;
+    }
+
     if (!isAdmin) {
       const cached = localStorage.getItem("quant_dashboard");
       if (cached) {
