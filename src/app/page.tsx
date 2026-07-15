@@ -222,7 +222,7 @@ function LandingContent() {
       try {
         const stmts = await api.getStatements();
         if (!stmts.statements || stmts.statements.length === 0) {
-          router.push("/upload");
+          router.push("/app?upload=true");
         } else {
           router.push("/app");
         }
@@ -264,7 +264,7 @@ function LandingContent() {
         try {
           const stmts = await api.getStatements();
           if (!stmts.statements || stmts.statements.length === 0) {
-            router.push("/upload");
+            router.push("/app?upload=true");
           } else {
             router.push("/app");
           }
@@ -388,7 +388,7 @@ function LandingContent() {
               onClick={() => {
                 const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
                 if (token) {
-                  router.push("/upload");
+                  router.push("/app?upload=true");
                 } else {
                   setAuthMode("signup");
                   setActiveSheet("auth");

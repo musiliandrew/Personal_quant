@@ -19,6 +19,16 @@ export default function HomePage() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchDashboard = () => {
+    api.getDashboard()
+      .then((res) => {
+        setDashboard(res);
+        localStorage.setItem("quant_dashboard", JSON.stringify(res));
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
+
   useEffect(() => {
     const cached = localStorage.getItem("quant_dashboard");
     if (cached) {
@@ -27,13 +37,10 @@ export default function HomePage() {
       } catch (_) {}
     }
 
-    api.getDashboard()
-      .then((res) => {
-        setDashboard(res);
-        localStorage.setItem("quant_dashboard", JSON.stringify(res));
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    fetchDashboard();
+
+    window.addEventListener("quant-statements-updated", fetchDashboard);
+    return () => window.removeEventListener("quant-statements-updated", fetchDashboard);
   }, []);
 
   const [showOnboardingTour, setShowOnboardingTour] = useState(false);
@@ -280,12 +287,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Link
-              href="/upload"
-              className="mt-3.5 flex items-center justify-center gap-2 rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.08] px-4 py-2.5 sm:py-3 text-[12px] sm:text-[13px] font-bold transition-all"
+            <button
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent("open-upload-modal"));
+              }}
+              className="mt-3.5 flex items-center justify-center gap-2 rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.08] px-4 py-2.5 sm:py-3 text-[12px] sm:text-[13px] font-bold transition-all w-full"
             >
               <Upload className="h-4 w-4 shrink-0" /> Upload latest statement to improve forecasts
-            </Link>
+            </button>
           </motion.div>
         </div>
       </div>

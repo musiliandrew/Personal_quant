@@ -95,7 +95,7 @@ export default function Onboarding() {
 
   const next = () => {
     if (step < STEPS.length - 1) setStep(step + 1);
-    else router.push("/upload");
+    else router.push("/app?upload=true");
   };
 
   return (
@@ -131,7 +131,7 @@ export default function Onboarding() {
             ))}
           </div>
 
-          <Link href="/upload" className="text-[12.5px] text-muted-foreground font-bold hover:text-foreground">
+          <Link href="/app?upload=true" className="text-[12.5px] text-muted-foreground font-bold hover:text-foreground">
             Skip
           </Link>
         </div>

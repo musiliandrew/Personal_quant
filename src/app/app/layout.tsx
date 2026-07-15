@@ -9,6 +9,7 @@ import { Logo } from "@/components/quant/logo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { UploadModal } from "@/components/quant/upload-modal";
 
 type NavItem = { to: "/app" | "/app/goals" | "/app/quant" | "/app/profile" | "/app/analysis"; label: string; icon: typeof Home; exact?: boolean };
 const items: NavItem[] = [
@@ -39,6 +40,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     period_start: string | null; period_end: string | null;
     upload_date: string; status: string; transaction_count: number;
   }>>([]);
+
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+  const fetchStatements = () => {
+    api.getStatements().then((res) => {
+      setStatements(res.statements || []);
+      // Notify other components (like dashboard /app page) that a new statement was uploaded
+      window.dispatchEvent(new CustomEvent("quant-statements-updated"));
+    }).catch(() => {});
+  };
 
   useEffect(() => {
     // ── Auth guard (client-side, second layer after middleware) ──
@@ -72,15 +83,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       api.getMe().then((user) => {
         setIsPro(user.is_pro);
       }).catch(() => {});
-      api.getStatements().then((res) => {
-        setStatements(res.statements || []);
-      }).catch(() => {});
+      fetchStatements();
     }
     // Recompute greeting every minute
     setGreeting(getGreeting());
     const interval = setInterval(() => setGreeting(getGreeting()), 60_000);
     return () => clearInterval(interval);
   }, [pathname, isAdmin, router]);
+
+  // Handle upload query parameter check and custom events
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("upload") === "true") {
+        setIsUploadOpen(true);
+        // Clean URL query params without reloading
+        const newUrl = window.location.pathname;
+        window.history.replaceState({ ...window.history.state }, "", newUrl);
+      }
+    }
+
+    const handleOpenUpload = () => setIsUploadOpen(true);
+    window.addEventListener("open-upload-modal", handleOpenUpload);
+    return () => window.removeEventListener("open-upload-modal", handleOpenUpload);
+  }, [pathname]);
 
   if (isAdmin) {
     return (
@@ -134,13 +160,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Upload Button */}
-            <Link
-              href="/upload"
-              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-dashed border-foreground/[0.12] text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/[0.02] transition-all text-[12.5px] font-bold group"
+            <button
+              onClick={() => setIsUploadOpen(true)}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-dashed border-foreground/[0.12] text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/[0.02] transition-all text-[12.5px] font-bold group w-full text-left"
             >
               <Upload className="h-4 w-4 group-hover:scale-110 transition-transform" />
               Upload Statement
-            </Link>
+            </button>
 
             {/* Statement List */}
             {statements.length > 0 && (
@@ -273,6 +299,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
       
       <BottomNav />
+      
+      <UploadModal 
+        isOpen={isUploadOpen} 
+        onClose={() => setIsUploadOpen(false)} 
+        onSuccess={fetchStatements} 
+      />
     </div>
   );
 }

@@ -119,12 +119,23 @@ export default function ProfilePage() {
       }));
     }).catch(() => {});
 
-    // Fetch uploaded statements
+    fetchStatements();
+
+    const handleUpdated = () => {
+      fetchStatements();
+    };
+
+    window.addEventListener("quant-statements-updated", handleUpdated);
+    return () => window.removeEventListener("quant-statements-updated", handleUpdated);
+  }, []);
+
+  const fetchStatements = () => {
+    setStatementsLoading(true);
     api.getStatements().then((res) => {
       setStatements(res.statements || []);
       setStatementsLoading(false);
     }).catch(() => setStatementsLoading(false));
-  }, []);
+  };
 
   useEffect(() => {
     const open = isLegalOpen || isBillsOpen;
@@ -213,13 +224,13 @@ export default function ProfilePage() {
               {statements.length > 0 ? `${statements.length} uploaded` : "No statements yet"}
             </p>
           </div>
-          <Link
-            href="/upload"
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("open-upload-modal"))}
             className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
           >
             <Upload className="h-3.5 w-3.5" />
             Upload
-          </Link>
+          </button>
         </div>
 
         <div className="px-4 sm:px-5 py-3">
@@ -237,12 +248,12 @@ export default function ProfilePage() {
                   Upload your M-Pesa PDF so Quant can analyse your money.
                 </p>
               </div>
-              <Link
-                href="/upload"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent("open-upload-modal"))}
                 className="inline-flex items-center gap-1.5 text-[12px] font-bold px-4 py-2 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
               >
                 <Upload className="h-4 w-4" /> Upload First Statement
-              </Link>
+              </button>
             </div>
           ) : (
             <div className="space-y-2">
