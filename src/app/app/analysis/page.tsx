@@ -397,8 +397,8 @@ export default function AnalysisPage() {
       {/* Content */}
       <div className="mt-4 sm:mt-5 space-y-3">
         {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
                 className="h-16 rounded-[20px] sm:rounded-[22px] bg-foreground/[0.04] animate-pulse"
@@ -407,9 +407,11 @@ export default function AnalysisPage() {
           </div>
         ) : tab === "monthly" ? (
           <>
-            {monthly?.months.slice(0, isPro ? undefined : 1).map((m, i) => (
-              <MonthCard key={m.month_key} data={m} index={i} />
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {monthly?.months.slice(0, isPro ? undefined : 1).map((m, i) => (
+                <MonthCard key={m.month_key} data={m} index={i} />
+              ))}
+            </div>
             {isPro === false && monthly?.months && monthly.months.length > 1 && (
               <div className="relative mt-4 overflow-hidden rounded-[24px] border border-foreground/10 p-6 text-center bg-transparent glass flex flex-col items-center justify-center min-h-[220px]">
                 <div className="absolute inset-0 -z-10 bg-background/30 backdrop-blur-md" />
@@ -435,9 +437,11 @@ export default function AnalysisPage() {
           </>
         ) : (
           <>
-            {weekly?.weeks.slice(0, isPro ? undefined : 1).map((w, i) => (
-              <WeekCard key={w.week_start} data={w} index={i} />
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {weekly?.weeks.slice(0, isPro ? undefined : 1).map((w, i) => (
+                <WeekCard key={w.week_start} data={w} index={i} />
+              ))}
+            </div>
             {isPro === false && weekly?.weeks && weekly.weeks.length > 1 && (
               <div className="relative mt-4 overflow-hidden rounded-[24px] border border-foreground/10 p-6 text-center bg-transparent glass flex flex-col items-center justify-center min-h-[220px]">
                 <div className="absolute inset-0 -z-10 bg-background/30 backdrop-blur-md" />

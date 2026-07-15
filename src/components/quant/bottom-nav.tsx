@@ -32,7 +32,7 @@ export function BottomNav() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[max(env(safe-area-inset-bottom),16px)]">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[max(env(safe-area-inset-bottom),16px)] md:hidden">
       <motion.nav
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: hideNav ? 120 : 0, opacity: hideNav ? 0 : 1 }}

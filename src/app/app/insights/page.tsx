@@ -469,7 +469,7 @@ export default function InsightsPage() {
                 Confirm the ones Quant got right. Edit or skip the rest.
               </p>
 
-              <div className="space-y-3">
+              <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 {aiSuggestions
                   .filter(s => !dismissedSuggestions.has(s.raw_pattern))
                   .map((s: any, i: number) => (
@@ -593,7 +593,7 @@ export default function InsightsPage() {
               <p className="text-[11px] sm:text-[12px] text-muted-foreground font-semibold mb-3">
                 These merchant names are unknown. Tell Quant what they are — it'll use this to coach you better.
               </p>
-              <div className="space-y-2">
+              <div className="space-y-2 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 {unresolved.slice(0, 6).map((u: any, i: number) => (
                   <button
                     key={i}
@@ -638,7 +638,7 @@ export default function InsightsPage() {
               className="glass rounded-[20px] sm:rounded-3xl p-4 sm:p-5"
             >
               <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-3">Quant Knows</p>
-              <div className="space-y-2">
+              <div className="space-y-2 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 {aliases.map((a: any) => (
                   <div key={a.id} className="flex items-center gap-2.5 rounded-xl sm:rounded-2xl bg-foreground/[0.03] px-3 py-2.5">
                     <span className="grid h-6.5 w-6.5 place-items-center rounded-lg bg-foreground/[0.06] shrink-0">

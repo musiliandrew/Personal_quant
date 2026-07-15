@@ -128,7 +128,7 @@ export default function GoalsPage() {
         </button>
       </div>
 
-      <div className="mt-4 sm:mt-5 space-y-4 pb-28">
+      <div className="mt-4 sm:mt-5 space-y-4 pb-28 md:grid md:grid-cols-2 md:gap-5 md:space-y-0">
         {loading ? (
           <div className="text-center py-12 text-[12px] sm:text-[13px] text-muted-foreground font-medium">
             Loading savings goals...

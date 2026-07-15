@@ -183,160 +183,173 @@ export default function ProfilePage() {
 
       <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} onSuccess={() => { setShowUpgrade(false); window.location.reload(); }} />
 
-      {/* Quant Financial Persona (Wrapped / develops over time) */}
-      <Section title="Quant Financial Persona">
-        {(!behaviour || !behaviour.impulse_score) ? (
-          <div className="p-4 sm:p-5 text-center">
-            <span className="inline-block px-2.5 py-0.5 rounded-full bg-foreground/[0.04] text-[10px] sm:text-[11px] text-muted-foreground font-semibold mb-1.5">
-              Developing...
-            </span>
-            <p className="text-[12px] sm:text-[13px] text-muted-foreground leading-relaxed px-4">
-              Your financial archetype is being calculated. Upload more transaction statements to unlock your profile.
-            </p>
-          </div>
-        ) : (
-          <div className="p-4 sm:p-5">
-            <div className="flex items-center justify-between mb-3 flex-wrap gap-1">
-              <span className="text-[9.5px] sm:text-[11px] uppercase tracking-wider bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded-full">
-                Archetype Unlocked
-              </span>
-              <span className="text-[11px] sm:text-[12px] text-muted-foreground font-semibold">
-                Impulse Score: {behaviour.impulse_score}%
-              </span>
-            </div>
-            
-            <div className="space-y-3">
-              {behaviour.overspend_days?.includes("Thursday") ? (
-                <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                  <h4 className="text-[13px] sm:text-[14px] font-bold text-amber-400 mb-0.5">🦖 Thursday Devourer</h4>
-                  <p className="text-[11.5px] sm:text-[12.5px] leading-relaxed text-muted-foreground">
-                    Your spending spikes heavily on Thursdays. **Recommendation:** Try staying home on Thursdays and keep your wallet locked.
-                  </p>
+      {/* Grid container for sections on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+        {/* Left Column */}
+        <div className="space-y-4 sm:space-y-5">
+          {/* Quant Financial Persona (Wrapped / develops over time) */}
+          <Section title="Quant Financial Persona">
+            {(!behaviour || !behaviour.impulse_score) ? (
+              <div className="p-4 sm:p-5 text-center">
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-foreground/[0.04] text-[10px] sm:text-[11px] text-muted-foreground font-semibold mb-1.5">
+                  Developing...
+                </span>
+                <p className="text-[12px] sm:text-[13px] text-muted-foreground leading-relaxed px-4">
+                  Your financial archetype is being calculated. Upload more transaction statements to unlock your profile.
+                </p>
+              </div>
+            ) : (
+              <div className="p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-1">
+                  <span className="text-[9.5px] sm:text-[11px] uppercase tracking-wider bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded-full">
+                    Archetype Unlocked
+                  </span>
+                  <span className="text-[11px] sm:text-[12px] text-muted-foreground font-semibold">
+                    Impulse Score: {behaviour.impulse_score}%
+                  </span>
                 </div>
-              ) : behaviour.weekend_multiplier > 1.5 ? (
-                <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-purple-500/5 border border-purple-500/10">
-                  <h4 className="text-[13px] sm:text-[14px] font-bold text-purple-400 mb-0.5">🎉 Weekend Warrior</h4>
-                  <p className="text-[11.5px] sm:text-[12.5px] leading-relaxed text-muted-foreground">
-                    You spend {behaviour.weekend_multiplier.toFixed(1)}x more on weekends than weekdays. Give your M-Pesa account a rest on Sundays.
-                  </p>
-                </div>
-              ) : (
-                <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-                  <h4 className="text-[13px] sm:text-[14px] font-bold text-emerald-400 mb-0.5">⚖️ Calculated Optimizer</h4>
-                  <p className="text-[11.5px] sm:text-[12.5px] leading-relaxed text-muted-foreground">
-                    Your spending remains highly consistent across all days. Watch out for recurring micro-payments.
-                  </p>
-                </div>
-              )}
+                
+                <div className="space-y-3">
+                  {behaviour.overspend_days?.includes("Thursday") ? (
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                      <h4 className="text-[13px] sm:text-[14px] font-bold text-amber-400 mb-0.5">🦖 Thursday Devourer</h4>
+                      <p className="text-[11.5px] sm:text-[12.5px] leading-relaxed text-muted-foreground">
+                        Your spending spikes heavily on Thursdays. **Recommendation:** Try staying home on Thursdays and keep your wallet locked.
+                      </p>
+                    </div>
+                  ) : behaviour.weekend_multiplier > 1.5 ? (
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-purple-500/5 border border-purple-500/10">
+                      <h4 className="text-[13px] sm:text-[14px] font-bold text-purple-400 mb-0.5">🎉 Weekend Warrior</h4>
+                      <p className="text-[11.5px] sm:text-[12.5px] leading-relaxed text-muted-foreground">
+                        You spend {behaviour.weekend_multiplier.toFixed(1)}x more on weekends than weekdays. Give your M-Pesa account a rest on Sundays.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+                      <h4 className="text-[13px] sm:text-[14px] font-bold text-emerald-400 mb-0.5">⚖️ Calculated Optimizer</h4>
+                      <p className="text-[11.5px] sm:text-[12.5px] leading-relaxed text-muted-foreground">
+                        Your spending remains highly consistent across all days. Watch out for recurring micro-payments.
+                      </p>
+                    </div>
+                  )}
 
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 pt-0.5">
-                <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-foreground/[0.03]">
-                  <p className="text-[9.5px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Weekend Flow</p>
-                  <p className="text-[13.5px] sm:text-[15px] font-bold tabular-nums">
-                    {behaviour.weekend_multiplier?.toFixed(1)}x weekday
-                  </p>
-                </div>
-                <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-foreground/[0.03]">
-                  <p className="text-[9.5px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Danger Days</p>
-                  <p className="text-[13.5px] sm:text-[15px] font-bold truncate">
-                    {behaviour.overspend_days && behaviour.overspend_days.length > 0
-                      ? behaviour.overspend_days.map((day: string) => {
-                          const d = day.toLowerCase();
-                          if (d.startsWith("mon")) return "Mon";
-                          if (d.startsWith("tue")) return "Tue";
-                          if (d.startsWith("wed")) return "Wed";
-                          if (d.startsWith("thu")) return "Thu";
-                          if (d.startsWith("fri")) return "Fri";
-                          if (d.startsWith("sat")) return "Sat";
-                          if (d.startsWith("sun")) return "Sun";
-                          return day;
-                        }).join(", ")
-                      : "None"}
-                  </p>
+                  <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 pt-0.5">
+                    <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-foreground/[0.03]">
+                      <p className="text-[9.5px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Weekend Flow</p>
+                      <p className="text-[13.5px] sm:text-[15px] font-bold tabular-nums">
+                        {behaviour.weekend_multiplier?.toFixed(1)}x weekday
+                      </p>
+                    </div>
+                    <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-foreground/[0.03]">
+                      <p className="text-[9.5px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Danger Days</p>
+                      <p className="text-[13.5px] sm:text-[15px] font-bold truncate">
+                        {behaviour.overspend_days && behaviour.overspend_days.length > 0
+                          ? behaviour.overspend_days.map((day: string) => {
+                              const d = day.toLowerCase();
+                              if (d.startsWith("mon")) return "Mon";
+                              if (d.startsWith("tue")) return "Tue";
+                              if (d.startsWith("wed")) return "Wed";
+                              if (d.startsWith("thu")) return "Thu";
+                              if (d.startsWith("fri")) return "Fri";
+                              if (d.startsWith("sat")) return "Sat";
+                              if (d.startsWith("sun")) return "Sun";
+                              return day;
+                            }).join(", ")
+                          : "None"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-      </Section>
+            )}
+          </Section>
 
-      {/* Fixed Bills Section */}
-      <Section title="Fixed Bills & Commitments">
-        <button
-          onClick={() => setIsBillsOpen(true)}
-          className="flex w-full items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-3 sm:py-4 text-left hover:bg-foreground/[0.02] transition-colors"
-        >
-          <span className="grid h-8.5 w-8.5 sm:h-9 sm:w-9 place-items-center rounded-xl sm:rounded-2xl bg-foreground/[0.05] shrink-0">
-            <Calendar className="h-4.5 w-4.5 text-primary" strokeWidth={1.8} />
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] sm:text-[14px] font-semibold">Manage Fixed Bills</p>
-            <p className="text-[10.5px] sm:text-[11px] text-muted-foreground font-bold truncate">
-              {loadingBills ? "Loading bills..." : `${bills.length} bills active · Total ${currency(totalBillsAmount)}/mo`}
-            </p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-        </button>
-      </Section>
+          {/* Fixed Bills Section */}
+          <Section title="Fixed Bills & Commitments">
+            <button
+              onClick={() => setIsBillsOpen(true)}
+              className="flex w-full items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-3 sm:py-4 text-left hover:bg-foreground/[0.02] transition-colors"
+            >
+              <span className="grid h-8.5 w-8.5 sm:h-9 sm:w-9 place-items-center rounded-xl sm:rounded-2xl bg-foreground/[0.05] shrink-0">
+                <Calendar className="h-4.5 w-4.5 text-primary" strokeWidth={1.8} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] sm:text-[14px] font-semibold">Manage Fixed Bills</p>
+                <p className="text-[10.5px] sm:text-[11px] text-muted-foreground font-bold truncate">
+                  {loadingBills ? "Loading bills..." : `${bills.length} bills active · Total ${currency(totalBillsAmount)}/mo`}
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            </button>
+          </Section>
 
-      <Section title="Data">
-        <Row icon={FileText} label="Connected Statements" hint="2 files · last 90 days" />
-        <Row icon={Download} label="Export Financial Report" hint="PDF" />
-        <Row icon={Trash2} label="Delete All Data" hint="Everything, one tap" danger />
-      </Section>
+          {/* Appearance */}
+          <Section title="Appearance">
+            <ToggleRow
+              label="Dark Mode"
+              hint="Match your evening"
+              value={dark}
+              onChange={setDark}
+              icon={Moon}
+            />
+            <Row icon={Palette} label="Theme" hint="Calm · Default" />
+          </Section>
+        </div>
 
-      <Section title="Privacy & Legal">
-        <button 
-          onClick={() => { setLegalType("terms"); setIsLegalOpen(true); }}
-          className="flex w-full items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-3 sm:py-3.5 text-left active:bg-foreground/[0.02]"
-        >
-          <span className="grid h-8.5 w-8.5 sm:h-9 sm:w-9 place-items-center rounded-xl sm:rounded-2xl bg-foreground/[0.05] shrink-0">
-            <FileText className="h-4 w-4" strokeWidth={1.8} />
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] sm:text-[14px] font-medium truncate">Terms of Service</p>
-            <p className="text-[10.5px] sm:text-[11px] text-muted-foreground font-semibold truncate">Agreement & usage guidelines</p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-        </button>
+        {/* Right Column */}
+        <div className="space-y-4 sm:space-y-5">
+          {/* Data */}
+          <Section title="Data">
+            <Row icon={FileText} label="Connected Statements" hint="2 files · last 90 days" />
+            <Row icon={Download} label="Export Financial Report" hint="PDF" />
+            <Row icon={Trash2} label="Delete All Data" hint="Everything, one tap" danger />
+          </Section>
 
-        <button 
-          onClick={() => { setLegalType("privacy"); setIsLegalOpen(true); }}
-          className="flex w-full items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-3 sm:py-3.5 text-left active:bg-foreground/[0.02]"
-        >
-          <span className="grid h-8.5 w-8.5 sm:h-9 sm:w-9 place-items-center rounded-xl sm:rounded-2xl bg-foreground/[0.05] shrink-0">
-            <ShieldCheck className="h-4 w-4" strokeWidth={1.8} />
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] sm:text-[14px] font-medium truncate">Privacy Policy</p>
-            <p className="text-[10.5px] sm:text-[11px] text-muted-foreground font-semibold truncate">Statement data & encryption details</p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-        </button>
+          {/* Privacy & Legal */}
+          <Section title="Privacy & Legal">
+            <button 
+              onClick={() => { setLegalType("terms"); setIsLegalOpen(true); }}
+              className="flex w-full items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-3 sm:py-3.5 text-left active:bg-foreground/[0.02]"
+            >
+              <span className="grid h-8.5 w-8.5 sm:h-9 sm:w-9 place-items-center rounded-xl sm:rounded-2xl bg-foreground/[0.05] shrink-0">
+                <FileText className="h-4 w-4" strokeWidth={1.8} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] sm:text-[14px] font-medium truncate">Terms of Service</p>
+                <p className="text-[10.5px] sm:text-[11px] text-muted-foreground font-semibold truncate">Agreement & usage guidelines</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            </button>
 
-        <ToggleRow
-          label="Delete statements after processing"
-          hint="Keep only the derived insights"
-          value={deleteAfterProcess}
-          onChange={handleToggleDelete}
-        />
-      </Section>
+            <button 
+              onClick={() => { setLegalType("privacy"); setIsLegalOpen(true); }}
+              className="flex w-full items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-3 sm:py-3.5 text-left active:bg-foreground/[0.02]"
+            >
+              <span className="grid h-8.5 w-8.5 sm:h-9 sm:w-9 place-items-center rounded-xl sm:rounded-2xl bg-foreground/[0.05] shrink-0">
+                <ShieldCheck className="h-4 w-4" strokeWidth={1.8} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] sm:text-[14px] font-medium truncate">Privacy Policy</p>
+                <p className="text-[10.5px] sm:text-[11px] text-muted-foreground font-semibold truncate">Statement data & encryption details</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            </button>
 
-      <Section title="Appearance">
-        <ToggleRow
-          label="Dark Mode"
-          hint="Match your evening"
-          value={dark}
-          onChange={setDark}
-          icon={Moon}
-        />
-        <Row icon={Palette} label="Theme" hint="Calm · Default" />
-      </Section>
+            <ToggleRow
+              label="Delete statements after processing"
+              hint="Keep only the derived insights"
+              value={deleteAfterProcess}
+              onChange={handleToggleDelete}
+            />
+          </Section>
 
-      <Section title="Notifications">
-        <Row icon={Bell} label="Daily Insight" hint="Every morning at 8:00" />
-        <Row icon={Bell} label="Budget Alerts" hint="When you're near a limit" />
-      </Section>
+          {/* Notifications */}
+          <Section title="Notifications">
+            <Row icon={Bell} label="Daily Insight" hint="Every morning at 8:00" />
+            <Row icon={Bell} label="Budget Alerts" hint="When you're near a limit" />
+          </Section>
+        </div>
+      </div>
 
 
       {/* Fixed Bills Drawer/Modal */}

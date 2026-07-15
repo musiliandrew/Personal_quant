@@ -4,6 +4,19 @@ import React, { useEffect, useState } from "react";
 import { BottomNav } from "@/components/quant/bottom-nav";
 import { NotificationBell } from "@/components/NotificationBell";
 import { usePathname, useRouter } from "next/navigation";
+import { Home, BarChart2, Target, MessageCircle, User } from "lucide-react";
+import { Logo } from "@/components/quant/logo";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+type NavItem = { to: "/app" | "/app/goals" | "/app/quant" | "/app/profile" | "/app/analysis"; label: string; icon: typeof Home; exact?: boolean };
+const items: NavItem[] = [
+  { to: "/app",           label: "Home",     icon: Home,          exact: true },
+  { to: "/app/quant",     label: "Quant",    icon: MessageCircle },
+  { to: "/app/analysis",  label: "Analysis", icon: BarChart2 },
+  { to: "/app/goals",     label: "Goals",    icon: Target },
+  { to: "/app/profile",   label: "Profile",  icon: User },
+];
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -50,11 +63,60 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative min-h-screen" style={{ background: "var(--gradient-hero)" }}>
-      <div className="mx-auto max-w-md pb-32 px-4">
-        {/* Global Sticky Greeting Header */}
+    <div className="relative min-h-screen flex flex-col md:flex-row" style={{ background: "var(--gradient-hero)" }}>
+      {/* Sleek Desktop Sidebar */}
+      <aside className="hidden md:flex md:w-64 lg:w-72 flex-col justify-between p-6 border-r border-foreground/[0.06] sticky top-0 h-screen bg-background/10 backdrop-blur-2xl z-30">
+        <div className="space-y-8">
+          {/* Logo */}
+          <div className="flex items-center gap-3 px-2">
+            <Logo size={32} className="text-foreground" />
+            <span className="text-[20px] font-black tracking-tight text-foreground">Quant</span>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="space-y-1">
+            {items.map((item) => {
+              const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  href={item.to}
+                  className={cn(
+                    "flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-bold transition-all duration-200",
+                    active 
+                      ? "bg-foreground/5 text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.02]"
+                  )}
+                >
+                  <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.7} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Profile Card & Info in Sidebar Footer */}
+        <div className="border-t border-foreground/[0.06] pt-5 space-y-4">
+          <div className="flex items-center gap-3 px-2">
+            <div className="h-10 w-10 rounded-full bg-foreground/[0.04] flex items-center justify-center font-bold text-[14px] uppercase border border-foreground/[0.08]">
+              {userName.slice(0, 2)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-bold truncate text-foreground">{userName}</p>
+              <p className="text-[11px] font-medium text-muted-foreground truncate">{greeting}</p>
+            </div>
+            <NotificationBell />
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 min-w-0">
+        {/* Mobile Sticky Header (Hidden on Desktop) */}
         <div 
-          className="sticky top-0 z-30 backdrop-blur-md pt-7 pb-3.5 -mx-4 px-4 border-b border-foreground/[0.04] mb-3"
+          className="sticky top-0 z-30 backdrop-blur-md pt-7 pb-3.5 px-4 border-b border-foreground/[0.04] mb-3 md:hidden"
           style={{ backgroundColor: "color-mix(in oklab, var(--background) 35%, transparent)" }}
         >
           <div className="flex items-center justify-between">
@@ -65,8 +127,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <NotificationBell />
           </div>
         </div>
-        {children}
-      </div>
+
+        {/* Dynamic Responsive wrapper for page content */}
+        <div className="mx-auto w-full max-w-md md:max-w-4xl lg:max-w-5xl px-4 py-4 md:px-8 md:py-10 pb-32 md:pb-16">
+          {/* Desktop header greeting (visible only on desktop) */}
+          <div className="hidden md:flex flex-col gap-0.5 mb-8">
+            <p className="text-[12px] lg:text-[13px] text-muted-foreground font-semibold uppercase tracking-wider">{greeting}</p>
+            <h1 className="text-[28px] lg:text-[34px] font-black tracking-tight text-foreground">{userName}</h1>
+          </div>
+          
+          {children}
+        </div>
+      </main>
+      
       <BottomNav />
     </div>
   );

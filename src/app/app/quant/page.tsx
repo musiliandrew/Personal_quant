@@ -293,7 +293,7 @@ function QuantPageContent() {
       />
 
       {/* Composer */}
-      <div className="fixed inset-x-0 bottom-24 z-40 mx-auto max-w-md px-5">
+      <div className="fixed inset-x-0 bottom-24 z-40 mx-auto max-w-md px-5 md:bottom-8 md:left-64 lg:left-72 md:right-0 md:max-w-2xl md:px-6">
         {isPro === false && promptCount >= 3 ? (
           <div className="glass-strong rounded-[22px] sm:rounded-3xl p-4 sm:p-5 text-center space-y-3.5 border border-rose-500/20 shadow-xl shadow-rose-500/5">
             <div className="space-y-1">

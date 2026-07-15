@@ -35,7 +35,7 @@ export default function ModesPage() {
         </p>
       </motion.div>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-4 md:grid md:grid-cols-2 md:gap-5 md:space-y-0">
         {modes.map((m, i) => (
           <motion.div
             key={m.id}
