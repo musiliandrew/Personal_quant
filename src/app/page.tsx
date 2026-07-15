@@ -254,116 +254,210 @@ export default function Landing() {
       </div>
 
       {/* Floating Centered Container Card */}
-      <div className="relative w-full h-full md:h-auto md:max-w-sm md:rounded-[32px] p-5 xs:p-6 flex flex-col justify-between md:min-h-[560px] z-10 bg-transparent md:glass md:border md:border-foreground/10 md:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)]">
-        {/* Top badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
-        >
-          <div className="glass flex items-center gap-2 rounded-full px-3 py-1.5 xs:px-4.5 xs:py-2">
-            <Logo size={28} className="text-foreground" />
-            <span className="text-[17px] xs:text-[19px] font-bold tracking-tight">Quant</span>
-          </div>
-          <div className="glass flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] text-muted-foreground font-semibold">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-            Private
-          </div>
-        </motion.div>
+      <div className="relative w-full h-full md:h-auto md:max-w-4xl lg:max-w-5xl md:w-full md:rounded-[32px] p-5 xs:p-6 flex flex-col md:grid md:grid-cols-12 md:gap-12 lg:gap-16 items-center justify-between md:min-h-[580px] z-10 bg-transparent md:glass md:border md:border-foreground/10 md:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)] md:p-10">
+        {/* Left Column: Badge, Hero, CTAs */}
+        <div className="flex flex-col justify-between h-full md:col-span-7 lg:col-span-7 space-y-6 md:space-y-8 w-full">
+          {/* Top badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between w-full"
+          >
+            <div className="glass flex items-center gap-2 rounded-full px-3 py-1.5 xs:px-4.5 xs:py-2">
+              <Logo size={28} className="text-foreground" />
+              <span className="text-[17px] xs:text-[19px] font-bold tracking-tight">Quant</span>
+            </div>
+            <div className="glass flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] text-muted-foreground font-semibold">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              Private
+            </div>
+          </motion.div>
 
-        {/* Hero */}
-        <div className="mt-2.5 xs:mt-3">
-          <h1 className="text-balance-tight text-[28px] xs:text-[32px] font-semibold leading-[1.08] tracking-tight">
-            Meet Your
-            <br />
-            <span className="italic font-medium" style={{ fontFamily: "var(--font-display)" }}>Personal</span>{" "}
-            Quant.
-          </h1>
-          <p className="mt-1.5 xs:mt-2 text-[12.5px] xs:text-[13.5px] leading-relaxed text-muted-foreground font-semibold">
-            Did you know you can buy your dream car if you cut ride-hailing by 30%?
-          </p>
+          {/* Hero */}
+          <div className="mt-2.5 xs:mt-3 md:mt-0">
+            <h1 className="text-balance-tight text-[28px] xs:text-[32px] md:text-[40px] lg:text-[48px] font-black leading-[1.08] tracking-tight">
+              Meet Your
+              <br />
+              <span className="italic font-medium" style={{ fontFamily: "var(--font-display)" }}>Personal</span>{" "}
+              Quant.
+            </h1>
+            <p className="mt-2 xs:mt-3 text-[12.5px] xs:text-[13.5px] lg:text-[15px] leading-relaxed text-muted-foreground font-semibold md:max-w-md">
+              Did you know you can buy your dream car if you cut ride-hailing by 30%? Connect your M-Pesa statements securely to start mapping.
+            </p>
+          </div>
+
+          {/* Interactive Funnel Grid - Mobile Only */}
+          <div className="grid grid-cols-2 gap-2 xs:gap-2.5 my-3 xs:my-4 md:hidden">
+            <button
+              onClick={() => setActiveSheet("simulator")}
+              className="glass flex flex-col items-start gap-1 rounded-2xl p-2.5 xs:p-3 text-left active:scale-[0.98] transition-transform hover:bg-foreground/[0.02]"
+            >
+              <Calculator className="h-4.5 w-4.5 xs:h-5 xs:w-5 text-sky-400" />
+              <div>
+                <p className="text-[11.5px] xs:text-[12.5px] font-semibold">Simulator</p>
+                <p className="text-[9.5px] xs:text-[10px] text-muted-foreground font-semibold leading-tight">Simulate targets</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setActiveSheet("quiz")}
+              className="glass flex flex-col items-start gap-1 rounded-2xl p-2.5 xs:p-3 text-left active:scale-[0.98] transition-transform hover:bg-foreground/[0.02]"
+            >
+              <Compass className="h-4.5 w-4.5 xs:h-5 xs:w-5 text-emerald-400" />
+              <div>
+                <p className="text-[11.5px] xs:text-[12.5px] font-semibold">Money Quiz</p>
+                <p className="text-[9.5px] xs:text-[10px] text-muted-foreground font-semibold leading-tight">Find your style</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setActiveSheet("chat")}
+              className="glass col-span-2 flex items-center justify-between rounded-2xl p-3 xs:p-3.5 text-left active:scale-[0.98] transition-transform hover:bg-foreground/[0.02]"
+            >
+              <div className="flex items-center gap-2.5">
+                <MessageSquare className="h-4.5 w-4.5 xs:h-5 xs:w-5 text-purple-400" />
+                <div>
+                  <p className="text-[12px] xs:text-[13px] font-semibold">Ask Generic Quant</p>
+                  <p className="text-[9.5px] xs:text-[10.5px] text-muted-foreground font-semibold">Test drive queries</p>
+                </div>
+              </div>
+              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* CTAs & Demo Trigger */}
+          <div className="flex flex-col gap-2.5 xs:gap-3 w-full">
+            <button
+              type="button"
+              onClick={() => {
+                const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
+                if (token) {
+                  router.push("/upload");
+                } else {
+                  setAuthMode("signup");
+                  setActiveSheet("auth");
+                }
+              }}
+              className="group flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-2.5 xs:px-6 xs:py-3 text-[13.5px] xs:text-[14px] font-bold text-background shadow-md transition-transform active:scale-[0.98] w-full"
+            >
+              Upload Statement
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
+                if (token) {
+                  router.push("/app");
+                } else {
+                  setAuthMode("login");
+                  setActiveSheet("auth");
+                }
+              }}
+              className="w-full rounded-full border border-foreground/15 hover:bg-foreground/[0.03] text-foreground py-2 xs:py-2.5 font-bold text-[12.5px] xs:text-[13px] transition-transform active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              Sign In / Create Account
+            </button>
+
+            <div className="grid grid-cols-3 gap-1 text-center text-[9px] xs:text-[10px] text-muted-foreground font-bold pt-1.5 xs:pt-2 mt-1 xs:mt-2 border-t border-foreground/5">
+              <div className="flex items-center justify-center gap-1"><Lock className="h-3 w-3" />Encrypted</div>
+              <div className="flex items-center justify-center gap-1"><ShieldCheck className="h-3.5 w-3.5" />Private</div>
+              <div className="flex items-center justify-center gap-1"><Trash2 className="h-3 w-3" />Clean Slate</div>
+            </div>
+          </div>
         </div>
 
-        {/* Interactive Funnel Grid */}
-        <div className="grid grid-cols-2 gap-2 xs:gap-2.5 my-3 xs:my-4">
-          <button
-            onClick={() => setActiveSheet("simulator")}
-            className="glass flex flex-col items-start gap-1 rounded-2xl p-2.5 xs:p-3 text-left active:scale-[0.98] transition-transform hover:bg-foreground/[0.02]"
-          >
-            <Calculator className="h-4.5 w-4.5 xs:h-5 xs:w-5 text-sky-400" />
-            <div>
-              <p className="text-[11.5px] xs:text-[12.5px] font-semibold">Simulator</p>
-              <p className="text-[9.5px] xs:text-[10px] text-muted-foreground font-semibold leading-tight">Simulate targets</p>
-            </div>
-          </button>
+        {/* Right Column: Interactive Twin Mockup (Desktop Only) */}
+        <div className="hidden md:flex md:col-span-5 w-full justify-center">
+          <div className="glass-strong border border-foreground/10 rounded-[32px] p-6 w-full max-w-sm min-h-[480px] shadow-2xl flex flex-col justify-between relative overflow-hidden">
+            {/* Decorative Ambient Orbs */}
+            <div className="absolute -top-16 -right-16 w-36 h-36 bg-purple-500/10 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none" />
 
-          <button
-            onClick={() => setActiveSheet("quiz")}
-            className="glass flex flex-col items-start gap-1 rounded-2xl p-2.5 xs:p-3 text-left active:scale-[0.98] transition-transform hover:bg-foreground/[0.02]"
-          >
-            <Compass className="h-4.5 w-4.5 xs:h-5 xs:w-5 text-emerald-400" />
-            <div>
-              <p className="text-[11.5px] xs:text-[12.5px] font-semibold">Money Quiz</p>
-              <p className="text-[9.5px] xs:text-[10px] text-muted-foreground font-semibold leading-tight">Find your style</p>
+            {/* Mock Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-foreground/[0.04] relative z-10">
+              <div className="flex items-center gap-1.5">
+                <Logo size={18} className="text-foreground" />
+                <span className="text-[11px] font-bold tracking-tight text-foreground uppercase">Quant Playground</span>
+              </div>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Active</span>
+              </span>
             </div>
-          </button>
 
-          <button
-            onClick={() => setActiveSheet("chat")}
-            className="glass col-span-2 flex items-center justify-between rounded-2xl p-3 xs:p-3.5 text-left active:scale-[0.98] transition-transform hover:bg-foreground/[0.02]"
-          >
-            <div className="flex items-center gap-2.5">
-              <MessageSquare className="h-4.5 w-4.5 xs:h-5 xs:w-5 text-purple-400" />
-              <div>
-                <p className="text-[12px] xs:text-[13px] font-semibold">Ask Generic Quant</p>
-                <p className="text-[9.5px] xs:text-[10.5px] text-muted-foreground font-semibold">Test drive queries</p>
+            {/* Simulated Live Interface */}
+            <div className="my-6 space-y-3.5 relative z-10">
+              {/* Financial Metric */}
+              <div className="glass rounded-2xl p-3 border border-foreground/[0.04] flex items-center justify-between shadow-sm bg-background/25">
+                <div>
+                  <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Monthly Surplus</p>
+                  <p className="text-[16px] font-extrabold text-foreground mt-0.5">KSh 18,240</p>
+                </div>
+                <TrendingUp className="h-5 w-5 text-emerald-400" />
+              </div>
+
+              {/* User Prompt */}
+              <div className="flex justify-end">
+                <div className="bg-foreground text-background text-[11px] font-semibold px-3 py-1.5 rounded-[16px] rounded-br-[4px] shadow-sm">
+                  Can I buy a KSh 6,500 bag?
+                </div>
+              </div>
+
+              {/* AI Verdict */}
+              <div className="glass rounded-[18px] rounded-bl-[4px] p-3 border border-foreground/[0.04] flex gap-2 shadow-sm bg-background/25">
+                <Sparkles className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-foreground/80 leading-relaxed font-semibold">
+                  Postpone it. Your forecasted balance tomorrow is KSh 2,814. Saving this KSh 6,500 buys your laptop 2 weeks earlier.
+                </p>
               </div>
             </div>
-            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-          </button>
-        </div>
 
-        {/* CTAs & Demo Trigger */}
-        <div className="flex flex-col gap-2.5 xs:gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
-              if (token) {
-                router.push("/upload");
-              } else {
-                setAuthMode("signup");
-                setActiveSheet("auth");
-              }
-            }}
-            className="group flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-2.5 xs:px-6 xs:py-3 text-[13.5px] xs:text-[14px] font-bold text-background shadow-md transition-transform active:scale-[0.98] w-full"
-          >
-            Upload Statement
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </button>
+            {/* Test Drive CTA Buttons */}
+            <div className="space-y-2.5 relative z-10 pt-3 border-t border-foreground/[0.04]">
+              <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest text-center">Test Drive Features</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setActiveSheet("simulator")}
+                  className="glass flex flex-col items-start gap-1 rounded-xl p-2.5 text-left active:scale-[0.98] transition-all hover:bg-foreground/[0.04] border-foreground/5 hover:border-foreground/10 bg-background/15"
+                >
+                  <Calculator className="h-4 w-4 text-sky-400" />
+                  <div>
+                    <p className="text-[11px] font-bold">Simulator</p>
+                    <p className="text-[8.5px] text-muted-foreground font-semibold leading-tight">Simulate goals</p>
+                  </div>
+                </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
-              if (token) {
-                router.push("/app");
-              } else {
-                setAuthMode("login");
-                setActiveSheet("auth");
-              }
-            }}
-            className="w-full rounded-full border border-foreground/15 hover:bg-foreground/[0.03] text-foreground py-2 xs:py-2.5 font-bold text-[12.5px] xs:text-[13px] transition-transform active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            Sign In / Create Account
-          </button>
+                <button
+                  onClick={() => setActiveSheet("quiz")}
+                  className="glass flex flex-col items-start gap-1 rounded-xl p-2.5 text-left active:scale-[0.98] transition-all hover:bg-foreground/[0.04] border-foreground/5 hover:border-foreground/10 bg-background/15"
+                >
+                  <Compass className="h-4 w-4 text-emerald-400" />
+                  <div>
+                    <p className="text-[11px] font-bold">Money Quiz</p>
+                    <p className="text-[8.5px] text-muted-foreground font-semibold leading-tight">Find style</p>
+                  </div>
+                </button>
+              </div>
 
-          <div className="grid grid-cols-3 gap-1 text-center text-[9px] xs:text-[10px] text-muted-foreground font-bold pt-1.5 xs:pt-2 mt-1 xs:mt-2 border-t border-foreground/5">
-            <div className="flex items-center justify-center gap-1"><Lock className="h-3 w-3" />Encrypted</div>
-            <div className="flex items-center justify-center gap-1"><ShieldCheck className="h-3.5 w-3.5" />Private</div>
-            <div className="flex items-center justify-center gap-1"><Trash2 className="h-3 w-3" />Clean Slate</div>
+              <button
+                onClick={() => setActiveSheet("chat")}
+                className="glass w-full flex items-center justify-between rounded-xl p-2.5 text-left active:scale-[0.98] transition-all hover:bg-foreground/[0.04] border-foreground/5 hover:border-foreground/10 bg-background/15"
+              >
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-purple-400" />
+                  <div>
+                    <p className="text-[11px] font-bold">Ask Generic Quant</p>
+                    <p className="text-[8.5px] text-muted-foreground font-semibold">Test drive queries</p>
+                  </div>
+                </div>
+                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
         {/* Funnel iOS sheets (Bottom Drawers on Mobile, Centered Modals on Desktop) */}
         <AnimatePresence>
@@ -715,7 +809,6 @@ export default function Landing() {
             </div>
           )}
         </AnimatePresence>
-      </div>
     </main>
   );
 }
