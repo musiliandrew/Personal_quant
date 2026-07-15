@@ -182,7 +182,17 @@ export default function Landing() {
       } else {
         await api.signup(authName, authEmail, authPassword);
       }
-      router.push("/app");
+      // Smart redirect: send new/uploadless users to upload first
+      try {
+        const stmts = await api.getStatements();
+        if (!stmts.statements || stmts.statements.length === 0) {
+          router.push("/upload");
+        } else {
+          router.push("/app");
+        }
+      } catch {
+        router.push("/app");
+      }
     } catch (err: any) {
       console.error("Auth error:", err);
       setAuthError(err.message || "Authentication failed. Check credentials.");
@@ -214,7 +224,17 @@ export default function Landing() {
       setAuthError(null);
       try {
         await api.googleLogin(response.credential);
-        router.push("/app");
+        // Smart redirect: send new/uploadless users to upload first
+        try {
+          const stmts = await api.getStatements();
+          if (!stmts.statements || stmts.statements.length === 0) {
+            router.push("/upload");
+          } else {
+            router.push("/app");
+          }
+        } catch {
+          router.push("/app");
+        }
       } catch (err: any) {
         console.error("Google auth error:", err);
         setAuthError(err.message || "Google authentication failed.");

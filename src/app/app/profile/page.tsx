@@ -15,6 +15,10 @@ import {
   Calendar,
   Plus,
   X,
+  Upload,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useTheme } from "@/components/ThemeProvider";
@@ -73,6 +77,12 @@ export default function ProfilePage() {
 
   const [userProfile, setUserProfile] = useState<{ name?: string; email?: string; isPro?: boolean } | null>(null);
   const [behaviour, setBehaviour] = useState<any>(null);
+  const [statements, setStatements] = useState<Array<{
+    id: string; provider: string;
+    period_start: string | null; period_end: string | null;
+    upload_date: string; status: string; transaction_count: number;
+  }>>([]);
+  const [statementsLoading, setStatementsLoading] = useState(true);
 
   useEffect(() => {
     fetchBills();
@@ -108,6 +118,12 @@ export default function ProfilePage() {
         isPro: res.is_pro,
       }));
     }).catch(() => {});
+
+    // Fetch uploaded statements
+    api.getStatements().then((res) => {
+      setStatements(res.statements || []);
+      setStatementsLoading(false);
+    }).catch(() => setStatementsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -182,6 +198,94 @@ export default function ProfilePage() {
       </motion.div>
 
       <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} onSuccess={() => { setShowUpgrade(false); window.location.reload(); }} />
+
+      {/* ── Statements Card (mobile-first; desktop has it in sidebar) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08 }}
+        className="glass rounded-[22px] sm:rounded-3xl overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3 border-b border-foreground/[0.04]">
+          <div>
+            <h3 className="text-[13px] sm:text-[14px] font-black tracking-tight">M-Pesa Statements</h3>
+            <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+              {statements.length > 0 ? `${statements.length} uploaded` : "No statements yet"}
+            </p>
+          </div>
+          <Link
+            href="/upload"
+            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            Upload
+          </Link>
+        </div>
+
+        <div className="px-4 sm:px-5 py-3">
+          {statementsLoading ? (
+            <div className="py-6 flex items-center justify-center gap-2">
+              <div className="h-4 w-4 rounded-full border-2 border-foreground/20 border-t-foreground/60 animate-spin" />
+              <p className="text-[11px] text-muted-foreground font-semibold">Loading…</p>
+            </div>
+          ) : statements.length === 0 ? (
+            <div className="py-6 text-center space-y-3">
+              <FileText className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+              <div>
+                <p className="text-[12px] font-bold text-foreground">No statements uploaded yet</p>
+                <p className="text-[10.5px] text-muted-foreground font-semibold mt-0.5">
+                  Upload your M-Pesa PDF so Quant can analyse your money.
+                </p>
+              </div>
+              <Link
+                href="/upload"
+                className="inline-flex items-center gap-1.5 text-[12px] font-bold px-4 py-2 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
+              >
+                <Upload className="h-4 w-4" /> Upload First Statement
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {statements.map((s) => {
+                const fmt = (d: string | null) =>
+                  d ? new Date(d).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" }) : "?";
+                const statusConfig = {
+                  COMPLETED: { icon: <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />, label: "Processed", cls: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+                  FAILED:    { icon: <AlertCircle   className="h-3.5 w-3.5 text-rose-400" />,    label: "Failed",    cls: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
+                  PENDING:   { icon: <Clock          className="h-3.5 w-3.5 text-amber-400 animate-pulse" />, label: "Processing", cls: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+                  PROCESSING:{ icon: <Clock          className="h-3.5 w-3.5 text-amber-400 animate-pulse" />, label: "Processing", cls: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+                };
+                const st = statusConfig[s.status as keyof typeof statusConfig] || statusConfig.PENDING;
+
+                return (
+                  <div
+                    key={s.id}
+                    className="flex items-start gap-3 p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] hover:bg-foreground/[0.04] transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-xl bg-foreground/[0.04] flex items-center justify-center shrink-0">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-[12px] font-bold text-foreground">
+                          {fmt(s.period_start)} → {fmt(s.period_end)}
+                        </p>
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${st.cls}`}>
+                          {st.icon} {st.label}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                        {s.transaction_count > 0 ? `${s.transaction_count} transactions · ` : ""}
+                        {s.provider} · Uploaded {new Date(s.upload_date).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </motion.div>
 
       {/* Grid container for sections on desktop */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
