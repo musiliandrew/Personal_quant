@@ -325,19 +325,33 @@ export default function Landing() {
 
         {/* CTAs & Demo Trigger */}
         <div className="flex flex-col gap-2.5 xs:gap-3">
-          <Link
-            href="/onboarding"
+          <button
+            type="button"
+            onClick={() => {
+              const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
+              if (token) {
+                router.push("/upload");
+              } else {
+                setAuthMode("signup");
+                setActiveSheet("auth");
+              }
+            }}
             className="group flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-2.5 xs:px-6 xs:py-3 text-[13.5px] xs:text-[14px] font-bold text-background shadow-md transition-transform active:scale-[0.98] w-full"
           >
             Upload Statement
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          </button>
 
           <button
             type="button"
             onClick={() => {
-              setAuthMode("login");
-              setActiveSheet("auth");
+              const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
+              if (token) {
+                router.push("/app");
+              } else {
+                setAuthMode("login");
+                setActiveSheet("auth");
+              }
             }}
             className="w-full rounded-full border border-foreground/15 hover:bg-foreground/[0.03] text-foreground py-2 xs:py-2.5 font-bold text-[12.5px] xs:text-[13px] transition-transform active:scale-[0.98] flex items-center justify-center gap-2"
           >
