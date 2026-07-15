@@ -44,9 +44,14 @@ function LandingContent() {
       router.replace(dest);
       return;
     }
-    // Not logged in but arrived via a ?redirect — auto-open sign-in sheet
-    if (searchParams.get("redirect")) {
-      setAuthMode("login");
+    // Not logged in but arrived via a ?redirect — auto-open auth sheet
+    const redirectPath = searchParams.get("redirect");
+    if (redirectPath) {
+      if (redirectPath.includes("upload") || redirectPath.includes("onboarding")) {
+        setAuthMode("signup");
+      } else {
+        setAuthMode("login");
+      }
       setActiveSheet("auth");
     }
   }, []);
@@ -60,6 +65,16 @@ function LandingContent() {
   const [authName, setAuthName] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  const handleRedirectOrAuth = (target: string) => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
+    if (token) {
+      router.push(target);
+    } else {
+      setAuthMode("signup");
+      setActiveSheet("auth");
+    }
+  };
 
   // 1. Decision Simulator State
   const [simIncome, setSimIncome] = useState("50000");
@@ -612,12 +627,13 @@ function LandingContent() {
                               </p>
                             </div>
 
-                            <Link
-                              href="/onboarding"
-                              className="mt-2 block text-center bg-sky-500 text-white py-2.5 rounded-full text-[12.5px] font-bold"
+                            <button
+                              type="button"
+                              onClick={() => handleRedirectOrAuth("/onboarding")}
+                              className="mt-2 block w-full text-center bg-sky-500 text-white py-2.5 rounded-full text-[12.5px] font-bold"
                             >
                               Verify with My Real Statement
-                            </Link>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -673,12 +689,13 @@ function LandingContent() {
                           >
                             Retake Quiz
                           </button>
-                          <Link
-                            href="/onboarding"
+                          <button
+                            type="button"
+                            onClick={() => handleRedirectOrAuth("/onboarding")}
                             className="flex-1 bg-foreground text-background py-3 rounded-full text-[13px] font-bold flex items-center justify-center"
                           >
                             Sync with M-Pesa
-                          </Link>
+                          </button>
                         </div>
                       </div>
                     )}
@@ -717,12 +734,13 @@ function LandingContent() {
                         </div>
                         <div className="border-t border-foreground/[0.06] pt-3 mt-1 text-center">
                           <p className="text-[11px] text-muted-foreground font-semibold mb-2">Want decisions based on your actual bank statements?</p>
-                          <Link
-                            href="/onboarding"
+                          <button
+                            type="button"
+                            onClick={() => handleRedirectOrAuth("/onboarding")}
                             className="inline-block bg-foreground text-background px-5 py-2 rounded-full text-[12px] font-bold"
                           >
                             Analyze My M-Pesa PDF
-                          </Link>
+                          </button>
                         </div>
                       </div>
                     )}
