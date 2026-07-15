@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { BottomNav } from "@/components/quant/bottom-nav";
 import { NotificationBell } from "@/components/NotificationBell";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, BarChart2, Target, MessageCircle, User } from "lucide-react";
+import { Home, BarChart2, Target, MessageCircle, User, Upload, FileText, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { Logo } from "@/components/quant/logo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -34,6 +34,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [userName, setUserName] = React.useState<string>("User");
   const [greeting, setGreeting] = useState(getGreeting());
   const [isPro, setIsPro] = useState<boolean | null>(null);
+  const [statements, setStatements] = useState<Array<{
+    id: string; provider: string; filename: string;
+    period_start: string | null; period_end: string | null;
+    upload_date: string; status: string; transaction_count: number;
+  }>>([]);
 
   useEffect(() => {
     // ── Auth guard (client-side, second layer after middleware) ──
@@ -63,9 +68,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           }
         } catch (_) {}
       }
-      // Fetch status
+      // Fetch status + statements
       api.getMe().then((user) => {
         setIsPro(user.is_pro);
+      }).catch(() => {});
+      api.getStatements().then((res) => {
+        setStatements(res.statements || []);
       }).catch(() => {});
     }
     // Recompute greeting every minute
@@ -115,6 +123,67 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
+
+          {/* ── Statements Section ────────────────────── */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-2">
+              <p className="text-[9.5px] font-black uppercase tracking-widest text-muted-foreground">Statements</p>
+              {statements.length > 0 && (
+                <span className="text-[8.5px] font-bold text-muted-foreground">{statements.length} uploaded</span>
+              )}
+            </div>
+
+            {/* Upload Button */}
+            <Link
+              href="/upload"
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-dashed border-foreground/[0.12] text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/[0.02] transition-all text-[12.5px] font-bold group"
+            >
+              <Upload className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              Upload Statement
+            </Link>
+
+            {/* Statement List */}
+            {statements.length > 0 && (
+              <div className="space-y-1.5 max-h-52 overflow-y-auto [scrollbar-width:thin] pr-0.5">
+                {statements.map((s) => {
+                  const fmt = (d: string | null) =>
+                    d ? new Date(d).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "2-digit" }) : "?";
+                  const statusIcon = s.status === "COMPLETED"
+                    ? <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
+                    : s.status === "FAILED"
+                    ? <AlertCircle className="h-3 w-3 text-rose-400 shrink-0" />
+                    : <Clock className="h-3 w-3 text-amber-400 shrink-0 animate-pulse" />;
+
+                  return (
+                    <div
+                      key={s.id}
+                      className="flex items-start gap-2 px-3 py-2 rounded-xl bg-foreground/[0.02] border border-foreground/[0.04] hover:bg-foreground/[0.04] transition-colors"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          {statusIcon}
+                          <p className="text-[10.5px] font-bold text-foreground truncate">
+                            {fmt(s.period_start)} → {fmt(s.period_end)}
+                          </p>
+                        </div>
+                        <p className="text-[8.5px] text-muted-foreground font-semibold mt-0.5">
+                          {s.transaction_count > 0 ? `${s.transaction_count} txns · ` : ""}
+                          {new Date(s.upload_date).toLocaleDateString("en-KE", { month: "short", day: "numeric" })}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {statements.length === 0 && (
+              <p className="text-[10px] text-muted-foreground font-semibold px-2 py-1">
+                No statements yet — upload your first M-Pesa PDF.
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Profile Card & Info in Sidebar Footer */}

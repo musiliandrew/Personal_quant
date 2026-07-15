@@ -208,14 +208,30 @@ export const api = {
         body: formData,
       });
     } catch (e: any) {
-      // Propagate explicit API errors (e.g. duplicate statement or validation failure)
       if (e.message && !e.message.includes("Failed to fetch") && !e.message.includes("NetworkError")) {
         throw e;
       }
       console.warn("Failed to upload statement to API, simulating locally:", e);
-      // Wait to simulate local processing pipeline
       await new Promise((resolve) => setTimeout(resolve, 5000));
       return { success: true };
+    }
+  },
+
+  async getStatements(): Promise<{ statements: Array<{
+    id: string;
+    provider: string;
+    filename: string;
+    period_start: string | null;
+    period_end: string | null;
+    upload_date: string;
+    status: string;
+    transaction_count: number;
+  }> }> {
+    try {
+      return await apiFetch<any>("/statements/");
+    } catch (e) {
+      console.warn("Failed to fetch statements:", e);
+      return { statements: [] };
     }
   },
 
