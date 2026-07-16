@@ -508,15 +508,22 @@ export const api = {
     return await apiFetch<any>(`/auth/admin/user-details/${userId}/`);
   },
 
-  async checkoutBilling(phoneNumber: string, amount?: number): Promise<any> {
+  async checkoutBilling(phoneNumber: string, amount?: number, packageName?: string): Promise<any> {
     return await apiFetch<any>("/auth/billing/checkout/", {
       method: "POST",
-      body: JSON.stringify({ phone_number: phoneNumber, amount }),
+      body: JSON.stringify({ phone_number: phoneNumber, amount, package: packageName }),
     });
   },
 
   async checkoutBillingStatus(reference: string): Promise<any> {
     return await apiFetch<any>(`/auth/billing/status/${reference}/`);
+  },
+
+  async verifyBillingPayment(phoneNumber: string): Promise<any> {
+    return await apiFetch<any>("/auth/billing/verify-payment/", {
+      method: "POST",
+      body: JSON.stringify({ phone_number: phoneNumber }),
+    });
   },
 
 
@@ -533,4 +540,3 @@ export const api = {
     return res;
   },
 };
-

@@ -28,6 +28,12 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedTier, setSelectedTier] = useState<49 | 199 | 999>(199);
 
+  const packageByTier: Record<49 | 199 | 999, "weekly" | "monthly" | "yearly"> = {
+    49: "weekly",
+    199: "monthly",
+    999: "yearly",
+  };
+
   // Fetch current user's phone if available on mount
   useEffect(() => {
     if (isOpen) {
@@ -60,13 +66,30 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
     setStep("waiting");
 
     try {
+      const completeSuccess = () => {
+        setStep("success");
+        setTimeout(() => { onSuccess(); onClose(); }, 1500);
+      };
+
+      const verifyPaidFallback = async () => {
+        try {
+          const verifyRes = await api.verifyBillingPayment(phoneNumber);
+          if (verifyRes?.user || verifyRes?.message) {
+            completeSuccess();
+            return true;
+          }
+        } catch (verifyErr) {
+          console.warn("Payment reconciliation did not confirm payment:", verifyErr);
+        }
+        return false;
+      };
+
       // Step 1: Initiate STK push — backend returns immediately with a reference
-      const initRes = await api.checkoutBilling(phoneNumber, selectedTier);
+      const initRes = await api.checkoutBilling(phoneNumber, selectedTier, packageByTier[selectedTier]);
 
       // Mock / instant success (no PayHero credentials)
       if (initRes?.status === "SUCCESS" && initRes?.user) {
-        setStep("success");
-        setTimeout(() => { onSuccess(); onClose(); }, 1500);
+        completeSuccess();
         return;
       }
 
@@ -80,17 +103,21 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
         const statusRes = await api.checkoutBillingStatus(reference);
 
         if (statusRes?.status === "SUCCESS") {
-          setStep("success");
-          setTimeout(() => { onSuccess(); onClose(); }, 1500);
+          completeSuccess();
           return;
         }
         if (statusRes?.status === "FAILED") {
+          setErrorMsg("Payment provider returned a failed status. Checking whether your payment was received...");
+          if (await verifyPaidFallback()) return;
           throw new Error("Payment was declined or cancelled. Please try again.");
         }
         // PENDING → keep polling
       }
 
-      throw new Error("Payment timed out. If you paid, please refresh — your account will be upgraded.");
+      setErrorMsg("Still confirming with M-Pesa. Checking payment records before we mark this as failed...");
+      if (await verifyPaidFallback()) return;
+
+      throw new Error("Payment is still pending. If you paid, tap Initiate again later or contact support with your M-Pesa message.");
     } catch (err: any) {
       console.error("Billing error:", err);
       setErrorMsg(err.message || "M-Pesa transaction failed. Please try again.");
