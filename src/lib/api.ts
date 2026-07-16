@@ -515,6 +515,10 @@ export const api = {
     });
   },
 
+  async checkoutBillingStatus(reference: string): Promise<any> {
+    return await apiFetch<any>(`/auth/billing/status/${reference}/`);
+  },
+
 
   async googleLogin(credential: string): Promise<any> {
     const res = await apiFetch<any>("/auth/google-login/", {

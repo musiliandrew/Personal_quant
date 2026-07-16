@@ -60,21 +60,37 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
     setStep("waiting");
 
     try {
-      // Step 1: Simulate Safaricom STK payment validation delay
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
-      // Step 2: Trigger API checkout
-      const response = await api.checkoutBilling(phoneNumber, selectedTier);
-      if (response && response.user) {
+      // Step 1: Initiate STK push — backend returns immediately with a reference
+      const initRes = await api.checkoutBilling(phoneNumber, selectedTier);
+
+      // Mock / instant success (no PayHero credentials)
+      if (initRes?.status === "SUCCESS" && initRes?.user) {
         setStep("success");
-        // Upgrade complete!
-        setTimeout(() => {
-          onSuccess();
-          onClose();
-        }, 1500);
-      } else {
-        throw new Error("Unable to verify billing. Please try again.");
+        setTimeout(() => { onSuccess(); onClose(); }, 1500);
+        return;
       }
+
+      const reference = initRes?.reference;
+      if (!reference) throw new Error("Payment initiation failed. Please try again.");
+
+      // Step 2: Poll /billing/status/<ref>/ every 3 s for up to 90 s
+      const maxAttempts = 30; // 30 × 3s = 90 s
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        const statusRes = await api.checkoutBillingStatus(reference);
+
+        if (statusRes?.status === "SUCCESS") {
+          setStep("success");
+          setTimeout(() => { onSuccess(); onClose(); }, 1500);
+          return;
+        }
+        if (statusRes?.status === "FAILED") {
+          throw new Error("Payment was declined or cancelled. Please try again.");
+        }
+        // PENDING → keep polling
+      }
+
+      throw new Error("Payment timed out. If you paid, please refresh — your account will be upgraded.");
     } catch (err: any) {
       console.error("Billing error:", err);
       setErrorMsg(err.message || "M-Pesa transaction failed. Please try again.");
