@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { BottomNav } from "@/components/quant/bottom-nav";
 import { NotificationBell } from "@/components/NotificationBell";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, BarChart2, Target, MessageCircle, User, Upload, FileText, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Home, BarChart2, Target, MessageCircle, User, Upload, FileText, CheckCircle2, Clock, AlertCircle, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { Logo } from "@/components/quant/logo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -42,6 +43,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }>>([]);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [showTeaserToast, setShowTeaserToast] = useState(false);
 
   const fetchStatements = () => {
     api.getStatements().then((res) => {
@@ -81,7 +83,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
       // Fetch status + statements
       api.getMe().then((user) => {
-        setIsPro(user.is_pro_active ?? user.is_pro);
+        const proActive = user.is_pro_active ?? user.is_pro;
+        setIsPro(proActive);
+        
+        if (!proActive) {
+          const lastTeaser = localStorage.getItem("quant_last_teaser");
+          const now = Date.now();
+          if (!lastTeaser || (now - parseInt(lastTeaser, 10)) > 3 * 24 * 60 * 60 * 1000) {
+            setTimeout(() => {
+              setShowTeaserToast(true);
+              localStorage.setItem("quant_last_teaser", now.toString());
+            }, 4000);
+          }
+        }
       }).catch(() => {});
       fetchStatements();
     }
@@ -305,6 +319,40 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         onClose={() => setIsUploadOpen(false)} 
         onSuccess={fetchStatements} 
       />
+
+      {/* Periodic Pro Teaser Toast */}
+      <AnimatePresence>
+        {showTeaserToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-50 max-w-sm rounded-2xl border border-sky-500/20 bg-background/90 p-4 shadow-2xl backdrop-blur-xl"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="grid mt-1 h-7 w-7 shrink-0 place-items-center rounded-full bg-sky-500/10">
+                <Sparkles className="h-3.5 w-3.5 text-sky-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[13px] font-bold text-foreground flex items-center gap-1.5">
+                  Did you know?
+                </p>
+                <p className="mt-1 text-[11.5px] font-semibold text-muted-foreground leading-relaxed">
+                  Pro users save an average of KSh 3,500/mo using Quant's Cut Simulator and insights.
+                </p>
+                <div className="mt-3 flex gap-3">
+                  <button onClick={() => { setShowTeaserToast(false); router.push('/app/profile') }} className="text-[11.5px] font-bold text-sky-400 hover:text-sky-300">
+                    See Pro benefits
+                  </button>
+                  <button onClick={() => setShowTeaserToast(false)} className="text-[11.5px] font-bold text-muted-foreground hover:text-foreground">
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

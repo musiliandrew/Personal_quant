@@ -441,6 +441,20 @@ export default function InsightsPage() {
               <p className="mt-3.5 text-[10px] sm:text-[11px] text-muted-foreground font-semibold text-center">
                 Tap any row to simulate cutting it
               </p>
+              {isPro === false && (
+                <div className="mt-4 rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 text-center">
+                  <div className="mx-auto mb-2 grid h-8 w-8 place-items-center rounded-full bg-sky-500/10">
+                    <Sparkles className="h-4 w-4 text-sky-500" />
+                  </div>
+                  <p className="text-[12px] font-bold text-foreground">Unlock your full Money Map</p>
+                  <p className="mt-1 text-[11px] font-semibold text-muted-foreground">
+                    Upgrade to Pro to run unlimited goal simulations and reveal all hidden spending patterns.
+                  </p>
+                  <button onClick={() => setIsUpgradeOpen(true)} className="mt-3 rounded-full bg-foreground px-4 py-1.5 text-[11px] font-bold text-background transition-transform active:scale-95">
+                    Upgrade to Pro
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
         </div>
