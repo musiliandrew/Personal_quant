@@ -81,7 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
       // Fetch status + statements
       api.getMe().then((user) => {
-        setIsPro(user.is_pro);
+        setIsPro(user.is_pro_active ?? user.is_pro);
       }).catch(() => {});
       fetchStatements();
     }

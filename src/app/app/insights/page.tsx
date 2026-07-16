@@ -103,7 +103,7 @@ export default function InsightsPage() {
       setUnresolved(res.unresolved_patterns || []);
       
       const user = await api.getMe();
-      setIsPro(user.is_pro);
+      setIsPro(user.is_pro_active ?? user.is_pro);
     } catch (_) {
       setIsPro(false);
     }

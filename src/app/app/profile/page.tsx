@@ -143,7 +143,7 @@ export default function ProfilePage() {
     api.getMe().then((res) => {
       setUserProfile((prev) => ({
         ...prev,
-        isPro: res.is_pro,
+        isPro: res.is_pro_active ?? res.is_pro,
       }));
     }).catch(() => {});
 

@@ -75,7 +75,7 @@ function QuantPageContent() {
   const checkProStatus = async () => {
     try {
       const user = await api.getMe();
-      setIsPro(user.is_pro);
+      setIsPro(user.is_pro_active ?? user.is_pro);
       setPromptCount(user.prompt_count || 0);
     } catch (e) {
       setIsPro(false);

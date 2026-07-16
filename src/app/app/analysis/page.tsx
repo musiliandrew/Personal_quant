@@ -322,7 +322,7 @@ export default function AnalysisPage() {
       .then(([m, w, user]) => {
         setMonthly(m);
         setWeekly(w);
-        setIsPro(user.is_pro);
+        setIsPro(user.is_pro_active ?? user.is_pro);
       })
       .catch((err) => {
         console.error("Error loading analysis data:", err);
