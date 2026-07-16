@@ -330,6 +330,10 @@ export const api = {
     }
   },
 
+  async deleteRecurringExpense(id: string | number): Promise<any> {
+    return await apiFetch<any>(`/transactions/recurring/${id}/`, { method: "DELETE" });
+  },
+
   async getSurvivalPack(): Promise<any> {
     try {
       return await apiFetch<any>("/transactions/survival/");

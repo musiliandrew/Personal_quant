@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChevronRight,
   FileText,
@@ -51,7 +51,6 @@ export default function ProfilePage() {
     localStorage.setItem("delete_after_process", String(val));
   };
   
-  // Form states for new bills
   const [merchantName, setMerchantName] = useState("");
   const [billLabel, setBillLabel] = useState("");
   const [amount, setAmount] = useState("");
@@ -60,6 +59,35 @@ export default function ProfilePage() {
   const [creating, setCreating] = useState(false);
   const [allMerchants, setAllMerchants] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Long-press delete state
+  const [holdBillId, setHoldBillId] = useState<string | null>(null);
+  const [deletingBillId, setDeletingBillId] = useState<string | null>(null);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startHold = (id: string) => {
+    holdTimer.current = setTimeout(() => setHoldBillId(id), 500);
+  };
+  const clearHold = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+  };
+  const cancelHold = () => {
+    clearHold();
+    setHoldBillId(null);
+  };
+
+  const handleDeleteBill = async (id: string) => {
+    setDeletingBillId(id);
+    setHoldBillId(null);
+    try {
+      await api.deleteRecurringExpense(id);
+      setBills(prev => prev.filter(b => String(b.id) !== String(id)));
+    } catch (err) {
+      console.error("Failed to delete bill", err);
+    } finally {
+      setDeletingBillId(null);
+    }
+  };
 
   const filteredSuggestions = allMerchants
     .filter((m) => m.toLowerCase().includes(merchantName.toLowerCase()))
@@ -498,20 +526,55 @@ export default function ProfilePage() {
                 ) : bills.length === 0 ? (
                   <p className="text-center py-6 text-[11px] sm:text-[12px] text-muted-foreground">No recurring bills added yet.</p>
                 ) : (
-                  bills.map((b) => (
-                    <div key={b.id} className="soft-card flex items-center justify-between px-3.5 py-2.5 sm:px-4 sm:py-3">
-                      <div>
+                bills.map((b) => {
+                    const billId = String(b.id);
+                    const isDeleting = deletingBillId === billId;
+                    const isHeld = holdBillId === billId;
+                    return (
+                    <div
+                      key={b.id}
+                      className={`soft-card flex items-center justify-between px-3.5 py-2.5 sm:px-4 sm:py-3 select-none transition-all relative overflow-hidden ${
+                        isHeld ? "ring-2 ring-red-500/50 bg-red-500/5" : ""
+                      }`}
+                      onMouseDown={() => startHold(billId)}
+                      onMouseUp={clearHold}
+                      onMouseLeave={cancelHold}
+                      onTouchStart={() => startHold(billId)}
+                      onTouchEnd={clearHold}
+                      onTouchCancel={cancelHold}
+                    >
+                      <div className="flex-1 min-w-0">
                         <p className="text-[13px] sm:text-[14px] font-semibold">{b.label || b.merchant_detail?.name || "Fixed Bill"}</p>
                         <p className="text-[9.5px] sm:text-[10px] text-muted-foreground font-bold tracking-wider uppercase">
                           {b.label && b.merchant_detail?.name ? `${b.merchant_detail.name} · ` : ""}
                           {b.frequency} {b.next_due ? `· Due ${new Date(b.next_due).toLocaleDateString("en-KE", { month: "short", day: "numeric" })}` : ""}
                         </p>
                       </div>
-                      <span className="text-[13px] sm:text-[14px] font-bold tabular-nums">
-                        {currency(parseFloat(b.amount) || 0)}
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <AnimatePresence>
+                          {isHeld && !isDeleting && (
+                            <motion.button
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteBill(billId); }}
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-lg"
+                            >
+                              <Trash2 className="h-3 w-3" /> Delete
+                            </motion.button>
+                          )}
+                        </AnimatePresence>
+                        {isDeleting ? (
+                          <div className="h-4 w-4 rounded-full border-2 border-red-400/30 border-t-red-400 animate-spin" />
+                        ) : (
+                          <span className="text-[13px] sm:text-[14px] font-bold tabular-nums">
+                            {currency(parseFloat(b.amount) || 0)}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
