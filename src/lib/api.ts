@@ -11,8 +11,6 @@ if (envType === "lan") {
   API_BASE_URL = process.env.NEXT_PUBLIC_API_URL_LOCAL || "http://localhost:8000";
 }
 
-// Basic Auth credentials for andrew@quant.ai : password123
-const AUTH_HEADER = "Basic YW5kcmV3QHF1YW50LmFpOnBhc3N3b3JkMTIz";
 
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
@@ -22,8 +20,6 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
     const token = typeof window !== "undefined" ? localStorage.getItem("quant_token") : null;
     if (token) {
       headers.set("Authorization", `Token ${token}`);
-    } else {
-      headers.set("Authorization", AUTH_HEADER);
     }
   }
   if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
