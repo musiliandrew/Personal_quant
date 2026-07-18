@@ -17,7 +17,13 @@ import {
   Calendar, 
   Smartphone,
   Eye,
-  EyeOff
+  EyeOff,
+  Activity,
+  AlertTriangle,
+  Clock,
+  Zap,
+  DollarSign,
+  BarChart2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -38,6 +44,20 @@ interface StatementStat {
   tx_count: number;
 }
 
+interface GrowthData {
+  date: string;
+  new_users: number;
+  statements: number;
+  revenue: number;
+  ai_requests: number;
+}
+
+interface ActivityItem {
+  type: string;
+  message: string;
+  time: string;
+}
+
 interface AdminData {
   total_users: number;
   total_files: number;
@@ -45,6 +65,20 @@ interface AdminData {
   total_revenue: number;
   recent_users: UserStat[];
   recent_statements: StatementStat[];
+  growth_data: GrowthData[];
+  activity_feed: ActivityItem[];
+  errors: {
+    failed_parses: number;
+    gemini_failures: number;
+    timeouts: number;
+    invalid_statements: number;
+  };
+  unit_economics: {
+    avg_parsing_time: number;
+    ai_cost_per_statement: number;
+    arpu: number;
+    avg_tx_per_statement: number;
+  };
 }
 
 export default function AdminPage() {
@@ -354,59 +388,182 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Lists / Tables */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              </div>
+
+              {/* Unit Economics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="glass border border-foreground/5 rounded-[20px] p-4">
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1.5"><Clock className="h-3 w-3" /> Avg Parse Time</p>
+                  <p className="text-[18px] font-bold mt-1">{stats?.unit_economics?.avg_parsing_time || 0}s</p>
+                </div>
+                <div className="glass border border-foreground/5 rounded-[20px] p-4">
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1.5"><Zap className="h-3 w-3 text-amber-400" /> Avg AI Cost</p>
+                  <p className="text-[18px] font-bold mt-1">${stats?.unit_economics?.ai_cost_per_statement || 0.05}</p>
+                </div>
+                <div className="glass border border-foreground/5 rounded-[20px] p-4">
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1.5"><DollarSign className="h-3 w-3 text-rose-400" /> ARPU</p>
+                  <p className="text-[18px] font-bold mt-1">KSh {stats?.unit_economics?.arpu || 0}</p>
+                </div>
+                <div className="glass border border-foreground/5 rounded-[20px] p-4">
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1.5"><TrendingUp className="h-3 w-3" /> Avg Tx/Upload</p>
+                  <p className="text-[18px] font-bold mt-1">{stats?.unit_economics?.avg_tx_per_statement || 0}</p>
+                </div>
+              </div>
+
+              {/* Error Monitoring & Growth / Feed */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                {/* Recent Registrations */}
-                <div className="glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
-                  <h3 className="text-[16px] font-semibold tracking-tight">Recent User Registrations</h3>
-                  <div className="space-y-3 overflow-y-auto max-h-[300px] pr-1">
-                    {stats?.recent_users && stats.recent_users.length > 0 ? (
-                      stats.recent_users.map((u) => (
-                        <button 
-                          key={u.id} 
-                          onClick={() => handleInspectUser(u.id)}
-                          className="w-full text-left glass bg-foreground/[0.02] hover:bg-foreground/[0.06] active:scale-[0.99] border border-foreground/5 rounded-2xl p-3 flex justify-between items-center transition-all cursor-pointer"
-                        >
-                          <div className="space-y-0.5">
-                            <p className="text-[13px] font-bold">{u.name}</p>
-                            <p className="text-[11.5px] text-muted-foreground/75 font-semibold">{u.email}</p>
-                            <p className="text-[10px] text-muted-foreground/50">Phone: {u.phone} • Joined: {new Date(u.created_at).toLocaleDateString()}</p>
+                {/* Live Activity Feed */}
+                <div className="md:col-span-1 glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
+                  <h3 className="text-[16px] font-semibold tracking-tight flex items-center gap-2">
+                    <Activity className="h-4.5 w-4.5 text-indigo-400" />
+                    Live Activity
+                  </h3>
+                  <div className="space-y-4 overflow-y-auto max-h-[350px] pr-1 relative before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-foreground/10">
+                    {stats?.activity_feed && stats.activity_feed.length > 0 ? (
+                      stats.activity_feed.map((act, i) => {
+                        const time = new Date(act.time);
+                        const isError = act.type.includes("FAILED");
+                        const isMoney = act.type === "PAYMENT";
+                        const isSuccess = act.type === "STATEMENT_SUCCESS";
+                        return (
+                          <div key={i} className="relative pl-8">
+                            <div className={`absolute left-1 top-1 h-3.5 w-3.5 rounded-full border-2 border-background z-10 ${
+                              isError ? "bg-rose-500" : isMoney ? "bg-emerald-500" : isSuccess ? "bg-indigo-500" : "bg-foreground/20"
+                            }`} />
+                            <div className="space-y-0.5">
+                              <p className="text-[11px] font-bold text-muted-foreground">
+                                {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                              <p className={`text-[13px] font-semibold ${isError ? 'text-rose-400' : 'text-foreground/90'}`}>
+                                {act.message}
+                              </p>
+                            </div>
                           </div>
-                          <span className="text-[11px] font-bold bg-indigo-500/10 text-indigo-400 rounded-full px-2.5 py-1">
-                            {u.file_count} files
-                          </span>
-                        </button>
-                      ))
+                        );
+                      })
                     ) : (
-                      <p className="text-[12px] text-muted-foreground text-center py-6">No users registered yet.</p>
+                      <p className="text-[12px] text-muted-foreground text-center py-6">No recent activity.</p>
                     )}
                   </div>
                 </div>
 
-                {/* Recent Uploaded Statements */}
-                <div className="glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
-                  <h3 className="text-[16px] font-semibold tracking-tight">Recent Uploaded Statements</h3>
-                  <div className="space-y-3 overflow-y-auto max-h-[300px] pr-1">
-                    {stats?.recent_statements && stats.recent_statements.length > 0 ? (
-                      stats.recent_statements.map((s) => (
-                        <div key={s.id} className="glass bg-foreground/[0.02] border border-foreground/5 rounded-2xl p-3 flex justify-between items-center transition-colors">
-                          <div className="space-y-0.5 max-w-[70%]">
-                            <p className="text-[13px] font-bold truncate">{s.filename}</p>
-                            <p className="text-[11.5px] text-muted-foreground/75 font-semibold truncate">{s.user_email}</p>
-                            <p className="text-[10px] text-muted-foreground/50">Uploaded: {new Date(s.uploaded_at).toLocaleDateString()}</p>
+                {/* Growth Charts & Errors */}
+                <div className="md:col-span-2 space-y-6">
+                  
+                  {/* Growth Chart (Simulated with Bars) */}
+                  <div className="glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
+                    <h3 className="text-[16px] font-semibold tracking-tight flex items-center gap-2">
+                      <BarChart2 className="h-4.5 w-4.5 text-emerald-400" />
+                      7-Day Growth Trends
+                    </h3>
+                    <div className="flex items-end justify-between gap-2 h-[150px] pt-4">
+                      {stats?.growth_data?.map((day, i) => {
+                        // Max expected for height scaling
+                        const maxStmts = Math.max(...(stats?.growth_data?.map(d => d.statements) || [1])) || 1;
+                        const heightPct = Math.max(10, (day.statements / maxStmts) * 100);
+                        return (
+                          <div key={i} className="flex flex-col items-center gap-2 flex-1 group relative">
+                            {/* Tooltip */}
+                            <div className="absolute -top-14 bg-foreground text-background text-[10px] p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap font-bold flex flex-col items-center">
+                              <span>{day.statements} Uploads</span>
+                              <span className="text-emerald-400">KSh {day.revenue}</span>
+                            </div>
+                            
+                            <div className="w-full max-w-[32px] bg-foreground/10 rounded-t-sm relative flex items-end justify-center transition-all group-hover:bg-foreground/20" style={{ height: '100%' }}>
+                              <div className="w-full bg-emerald-400/80 rounded-t-sm transition-all" style={{ height: `${heightPct}%` }} />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground font-bold tracking-tighter truncate w-full text-center">{day.date}</span>
                           </div>
-                          <span className="text-[11px] font-bold bg-emerald-500/10 text-emerald-400 rounded-full px-2.5 py-1 shrink-0">
-                            {s.tx_count} txs
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-[12px] text-muted-foreground text-center py-6">No statements read yet.</p>
-                    )}
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
 
+                  {/* Error Monitoring */}
+                  <div className="glass border border-rose-500/20 rounded-[28px] p-5 space-y-4 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                      <AlertTriangle className="h-24 w-24 text-rose-500" />
+                    </div>
+                    <h3 className="text-[16px] font-semibold tracking-tight flex items-center gap-2 text-rose-400 relative z-10">
+                      <AlertTriangle className="h-4.5 w-4.5" />
+                      System Health & Errors
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                      <div>
+                        <p className="text-[11px] text-rose-400/70 font-bold uppercase tracking-wider">Failed Parses</p>
+                        <p className="text-[20px] font-bold text-rose-400">{stats?.errors?.failed_parses || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] text-rose-400/70 font-bold uppercase tracking-wider">Gemini Fails</p>
+                        <p className="text-[20px] font-bold text-rose-400">{stats?.errors?.gemini_failures || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] text-rose-400/70 font-bold uppercase tracking-wider">Timeouts</p>
+                        <p className="text-[20px] font-bold text-rose-400">{stats?.errors?.timeouts || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] text-rose-400/70 font-bold uppercase tracking-wider">Invalid Docs</p>
+                        <p className="text-[20px] font-bold text-rose-400">{stats?.errors?.invalid_statements || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Comprehensive User Directory Table */}
+              <div className="glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
+                <h3 className="text-[16px] font-semibold tracking-tight flex items-center gap-2">
+                  <Users className="h-4.5 w-4.5 text-indigo-400" />
+                  User Directory
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-foreground/5">
+                        <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">User</th>
+                        <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Contact</th>
+                        <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Statements</th>
+                        <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Joined Date</th>
+                        <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-foreground/5">
+                      {stats?.recent_users && stats.recent_users.length > 0 ? (
+                        stats.recent_users.map((u) => (
+                          <tr key={u.id} className="hover:bg-foreground/[0.02] transition-colors group">
+                            <td className="py-3 px-4">
+                              <p className="text-[13px] font-bold text-foreground/90">{u.name}</p>
+                              <p className="text-[11px] text-muted-foreground">{u.email}</p>
+                            </td>
+                            <td className="py-3 px-4 text-[12px] font-semibold text-foreground/80">{u.phone}</td>
+                            <td className="py-3 px-4">
+                              <span className="text-[11px] font-bold bg-indigo-500/10 text-indigo-400 rounded-full px-2.5 py-1">
+                                {u.file_count} files
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-[12px] text-muted-foreground">
+                              {new Date(u.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <button
+                                onClick={() => handleInspectUser(u.id)}
+                                className="text-[11px] font-bold bg-foreground/10 hover:bg-foreground/20 text-foreground px-3 py-1.5 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              >
+                                Inspect
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-6 text-center text-[12px] text-muted-foreground">No users found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
             </motion.div>
@@ -514,8 +671,12 @@ export default function AdminPage() {
                               Uploaded: {new Date(stmt.uploaded_at).toLocaleString()}
                             </p>
                           </div>
-                          <span className="text-[10.5px] font-bold bg-emerald-500/10 text-emerald-400 rounded-full px-2.5 py-0.5 shrink-0">
-                            {stmt.tx_count} Transactions
+                          <span className={`text-[10.5px] font-bold rounded-full px-2.5 py-0.5 shrink-0 ${
+                            stmt.tx_count === 0 
+                              ? "bg-rose-500/10 text-rose-400" 
+                              : "bg-emerald-500/10 text-emerald-400"
+                          }`}>
+                            {stmt.tx_count === 0 ? "FAILED (0 tx)" : `${stmt.tx_count} Transactions`}
                           </span>
                         </div>
                       ))
