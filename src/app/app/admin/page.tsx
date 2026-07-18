@@ -92,7 +92,6 @@ export default function AdminPage() {
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<AdminData | null>(null);
-  const [pricePerFile, setPricePerFile] = useState(150); // Default simulated price
   const [refreshing, setRefreshing] = useState(false);
 
   // Inspector states
@@ -163,9 +162,6 @@ export default function AdminPage() {
       setInspectLoading(false);
     }
   };
-
-  // Calculate platform revenue dynamically based on pricing slider
-  const dynamicRevenue = stats ? stats.total_files * pricePerFile : 0;
 
   if (loading) {
     return (
@@ -347,43 +343,8 @@ export default function AdminPage() {
                   <div>
                     <p className="text-[12px] text-muted-foreground font-bold">Platform Revenue</p>
                     <h3 className="text-[24px] font-bold tracking-tight text-rose-400">
-                      KSh {dynamicRevenue.toLocaleString()}
+                      KSh {(stats?.total_revenue || 0).toLocaleString()}
                     </h3>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pricing & Fee Calculator */}
-              <div className="glass border border-foreground/10 rounded-[28px] p-6 space-y-4">
-                <div className="flex items-center gap-2 text-[14px] font-bold uppercase tracking-wider text-muted-foreground">
-                  <Calculator className="h-4 w-4 text-rose-400" />
-                  Pricing & Revenue Calculator
-                </div>
-                
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex-1 space-y-2">
-                    <p className="text-[13px] text-muted-foreground font-semibold leading-relaxed">
-                      Slide to adjust the pay-per-upload fee. Use this tool to calculate revenue yields and choose the pricing plan for billing integrations.
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <span className="text-[12px] font-semibold text-muted-foreground">KSh 50</span>
-                      <input
-                        type="range"
-                        min="50"
-                        max="500"
-                        step="25"
-                        value={pricePerFile}
-                        onChange={(e) => setPricePerFile(Number(e.target.value))}
-                        className="flex-1 accent-rose-400 h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer"
-                      />
-                      <span className="text-[12px] font-semibold text-muted-foreground">KSh 500</span>
-                    </div>
-                  </div>
-
-                  <div className="glass bg-foreground/[0.02] border border-foreground/5 rounded-2xl p-4 text-center shrink-0 min-w-[200px]">
-                    <p className="text-[11.5px] text-muted-foreground font-bold uppercase tracking-wider">Plan Fee</p>
-                    <h4 className="text-[20px] font-bold text-rose-400 mt-1">KSh {pricePerFile} / upload</h4>
-                    <p className="text-[10px] text-muted-foreground/60 mt-0.5">Yields KSh {dynamicRevenue.toLocaleString()}</p>
                   </div>
                 </div>
               </div>
