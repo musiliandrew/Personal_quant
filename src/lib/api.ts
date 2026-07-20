@@ -500,6 +500,13 @@ export const api = {
     await apiFetch<any>("/notifications/", { method: "DELETE" });
   },
 
+  async subscribePush(subscription: PushSubscription): Promise<void> {
+    await apiFetch<any>("/notifications/push-subscribe/", {
+      method: "POST",
+      body: JSON.stringify(subscription),
+    });
+  },
+
   async getAdminStats(): Promise<any> {
     return await apiFetch<any>("/auth/admin/stats/");
   },

@@ -103,6 +103,43 @@ export function NotificationBell() {
     } catch (_) {}
   };
 
+  const handleSubscribePush = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert("Push notifications are not supported by your browser.");
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert("Permission denied for push notifications.");
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+         console.error("VAPID public key not set in environment.");
+         return;
+      }
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: vapidPublicKey
+      });
+
+      const subData = subscription.toJSON();
+      await api.subscribePush(subData as any);
+      alert("Successfully subscribed to push notifications!");
+    } catch (e) {
+      console.error("Error subscribing to push notifications:", e);
+      alert("Failed to subscribe to push notifications.");
+    }
+  };
+
+  const hasPushPermission = typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -134,6 +171,14 @@ export function NotificationBell() {
             <div className="flex items-center justify-between mb-3 px-1">
               <p className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground">Notifications</p>
               <div className="flex items-center gap-2">
+                {!hasPushPermission && (
+                  <button
+                    onClick={handleSubscribePush}
+                    className="text-[10px] text-sky-500 hover:text-sky-600 font-bold transition-colors mr-2"
+                  >
+                    Enable Push
+                  </button>
+                )}
                 {notifs.length > 0 && (
                   <button
                     onClick={handleClearAll}
