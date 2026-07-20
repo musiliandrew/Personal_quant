@@ -198,7 +198,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                       Locked Statement
                     </h2>
                     <p className="mt-2 text-[12px] text-muted-foreground font-semibold px-2 leading-relaxed">
-                      This statement is password-protected. Email statements are locked using your National ID, Passport, or Phone Number.
+                      This statement is password-protected. Safaricom now locks M-Pesa statements with an SMS One-Time Password (OTP) sent to your phone.
                     </p>
 
                     <form
