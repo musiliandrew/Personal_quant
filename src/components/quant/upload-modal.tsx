@@ -67,6 +67,25 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     }
   }, [isOpen]);
 
+  const formatErrorMessage = (msg: string) => {
+    if (!msg) return "An unexpected error occurred. Please try again.";
+    const lowerMsg = msg.toLowerCase();
+    
+    if (lowerMsg.includes("invalid pdf") || lowerMsg.includes("safaricom")) {
+      return "Unsupported format. Please upload an official Safaricom M-Pesa PDF. We don't support Word docs, bank statements, or screenshots yet.";
+    }
+    if (lowerMsg.includes("timeout") || lowerMsg.includes("failed to fetch") || lowerMsg.includes("504") || lowerMsg.includes("502")) {
+      return "Processing took too long. We've queued your statement in the background—check your dashboard in a few minutes.";
+    }
+    if (lowerMsg.includes("failed to open pdf") || lowerMsg.includes("corrupt") || lowerMsg.includes("eof")) {
+      return "This PDF file seems corrupted. Please request a fresh copy from Safaricom and try again.";
+    }
+    if (lowerMsg.includes("already been uploaded")) {
+      return "You've already uploaded this statement! Please upload a statement for a different time period.";
+    }
+    return msg;
+  };
+
   const handleFileUpload = async (file: File, password?: string) => {
     setErrorMsg(null);
     setProcessing(true);
@@ -81,14 +100,13 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
           setIsIncorrectPassword(response.code === "INVALID_PASSWORD");
           setErrorMsg(null);
         } else {
-          setErrorMsg(response.error);
+          setErrorMsg(formatErrorMessage(response.error));
         }
         setProcessing(false);
       } else {
         setShowPasswordPrompt(false);
         setIsIncorrectPassword(false);
         setPdfPassword("");
-        // Fast forward animations to end
         setCurrent(steps.length);
         setTimeout(() => {
           setProcessing(false);
@@ -107,7 +125,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
         setShowPasswordPrompt(true);
         setIsIncorrectPassword(err.message.includes("Incorrect") || err.code === "INVALID_PASSWORD");
       } else {
-        setErrorMsg(err.message || "Failed to upload statement.");
+        setErrorMsg(formatErrorMessage(err.message || "Failed to upload statement."));
       }
       setProcessing(false);
     }
