@@ -546,4 +546,24 @@ export const api = {
     }
     return res;
   },
+
+  async getAdminEmailTemplates(): Promise<any[]> {
+    return await apiFetch<any[]>("/notifications/admin/campaigns/");
+  },
+
+  async sendAdminEmailCampaign(subject: string, body: string, recipients: string[], templateId?: string, segment?: string, grantPro?: boolean): Promise<any> {
+    return await apiFetch<any>("/notifications/admin/campaigns/", {
+      method: "POST",
+      body: JSON.stringify({ 
+        subject, 
+        body, 
+        recipients, 
+        template_id: templateId,
+        segment: segment,
+        grant_pro: grantPro
+      }),
+    });
+  },
 };
+
+

@@ -23,9 +23,112 @@ import {
   Clock,
   Zap,
   DollarSign,
-  BarChart2
+  BarChart2,
+  Mail,
+  Send
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+
+const PRESET_TEMPLATES: Record<string, { subject: string, body: string }> = {
+  UPLOAD_FAILED: {
+    subject: "We fixed your statement upload",
+    body: `Hi {{FirstName}},
+
+Thank you for trying Quant Personal Accountant.
+
+We noticed that your statement couldn't be processed because of an issue on our side. We've identified the problem and deployed improvements to make uploads significantly more reliable.
+
+As a thank-you for your patience, we've activated 3 days of Quant Pro on your account at no cost.
+
+Please upload your statement again and let us know how it goes.
+
+If you experience any issue at all, simply reply to this email. You'll be talking directly to our team.
+
+Thank you for helping us build something better.
+
+— Andrew
+Founder, Quant
+
+---
+Your privacy comes first.
+Your financial statements are processed securely using encrypted infrastructure. We never sell your personal financial data, and you remain in control of your information. Learn more in our Privacy Policy:
+https://accountant.quantiq.co.ke/privacy`
+  },
+  NO_UPLOAD: {
+    subject: "Your free 3-day Quant Pro access is waiting",
+    body: `Hi {{FirstName}},
+
+Thanks for creating your Quant account.
+
+We noticed you haven't analyzed your first statement yet.
+
+To help you explore everything the platform offers, we've unlocked 3 days of Quant Pro completely free.
+
+Upload your statement and discover:
+• Spending insights
+• Saving opportunities
+• Merchant breakdowns
+• Cash-flow analysis
+• Personalized financial recommendations
+
+If anything isn't clear, reply to this email and we'll help personally.
+
+We'd love to hear what you think.
+
+— Andrew
+Founder, Quant
+
+---
+Your privacy comes first.
+Your financial statements are processed securely using encrypted infrastructure. We never sell your personal financial data, and you remain in control of your information. Learn more in our Privacy Policy:
+https://accountant.quantiq.co.ke/privacy`
+  },
+  SUCCESSFUL_FREE: {
+    subject: "Thank you for trying Quant",
+    body: `Hi {{FirstName}},
+
+Thank you for trying Quant Personal Accountant.
+
+You're one of the first people helping shape the future of AI-powered financial intelligence.
+
+To say thanks, we've unlocked 3 days of Quant Pro for your account.
+
+If you have ideas, feedback, or something you'd love Quant to do, we'd genuinely like to hear it. Every suggestion helps us improve.
+
+Thank you for being an early supporter.
+
+— Andrew
+Founder, Quant
+
+---
+Your privacy comes first.
+Your financial statements are processed securely using encrypted infrastructure. We never sell your personal financial data, and you remain in control of your information. Learn more in our Privacy Policy:
+https://accountant.quantiq.co.ke/privacy`
+  },
+  PAID_USERS: {
+    subject: "Thank you for supporting Quant ❤️",
+    body: `Hi {{FirstName}},
+
+Thank you for becoming one of Quant's very first Pro customers.
+
+Your support isn't just a purchase—it directly helps us improve the product and build the future of personal financial intelligence.
+
+As a token of appreciation, we've extended your account with an additional 3 free days of Quant Pro.
+
+If you ever encounter an issue or have an idea, you'll always receive priority support. We're building Quant together with our earliest users.
+
+Thank you for believing in us.
+
+— Andrew
+Founder, Quant
+
+---
+Your privacy comes first.
+Your financial statements are processed securely using encrypted infrastructure. We never sell your personal financial data, and you remain in control of your information. Learn more in our Privacy Policy:
+https://accountant.quantiq.co.ke/privacy`
+  }
+};
+
 
 interface UserStat {
   id: string;
@@ -33,6 +136,7 @@ interface UserStat {
   email: string;
   phone: string;
   created_at: string;
+  last_active?: string;
   file_count: number;
 }
 
@@ -99,6 +203,15 @@ export default function AdminPage() {
   const [inspectStatements, setInspectStatements] = useState<any[]>([]);
   const [inspectLoading, setInspectLoading] = useState(false);
 
+  // Email Campaigns state
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [campaignSubject, setCampaignSubject] = useState("");
+  const [campaignBody, setCampaignBody] = useState("");
+  const [campaignSending, setCampaignSending] = useState(false);
+  const [campaignMessage, setCampaignMessage] = useState("");
+  const [campaignSegment, setCampaignSegment] = useState("ALL");
+  const [campaignGrantPro, setCampaignGrantPro] = useState(false);
+
   // Check if current user is admin on mount
   useEffect(() => {
     const token = localStorage.getItem("quant_token");
@@ -116,12 +229,49 @@ export default function AdminPage() {
       const data = await api.getAdminStats();
       setStats(data);
       setIsAdmin(true);
+      
+      // Also fetch email templates
+      try {
+        const tpls = await api.getAdminEmailTemplates();
+        setTemplates(tpls);
+      } catch(e) {
+        console.warn("Failed to load templates:", e);
+      }
     } catch (err: any) {
       console.warn("Failed to fetch admin stats:", err);
       setIsAdmin(false);
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const handleSendCampaign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!campaignSubject || !campaignBody) return;
+    
+    setCampaignSending(true);
+    setCampaignMessage("");
+    try {
+      // If segment is ALL, we just use "all" array.
+      const recipients = campaignSegment === "ALL" ? ["all"] : [];
+      const segmentStr = campaignSegment === "ALL" ? undefined : campaignSegment;
+      
+      const res = await api.sendAdminEmailCampaign(
+        campaignSubject, 
+        campaignBody, 
+        recipients, 
+        undefined, 
+        segmentStr, 
+        campaignGrantPro
+      );
+      setCampaignMessage(`Successfully sent emails to ${res.sent_count} users!${res.pro_granted ? " (Granted 3 Days Pro)" : ""}`);
+      setCampaignSubject("");
+      setCampaignBody("");
+    } catch(err: any) {
+      setCampaignMessage(`Failed to send: ${err.message}`);
+    } finally {
+      setCampaignSending(false);
     }
   };
 
@@ -470,6 +620,91 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Mass Email Campaign Section */}
+              <div className="glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
+                <h3 className="text-[16px] font-semibold tracking-tight flex items-center gap-2">
+                  <Mail className="h-4.5 w-4.5 text-indigo-400" />
+                  Email Communications & Segments
+                </h3>
+                <form onSubmit={handleSendCampaign} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="glass rounded-xl flex flex-col px-3 py-1.5 border border-foreground/5">
+                        <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Target Segment</label>
+                        <select 
+                          className="bg-transparent text-[13px] font-semibold outline-none py-1 text-foreground"
+                          value={campaignSegment}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setCampaignSegment(val);
+                            if (PRESET_TEMPLATES[val]) {
+                              setCampaignSubject(PRESET_TEMPLATES[val].subject);
+                              setCampaignBody(PRESET_TEMPLATES[val].body);
+                              setCampaignGrantPro(true);
+                            }
+                          }}
+                        >
+                          <option value="ALL">All Active Users</option>
+                          <option value="UPLOAD_FAILED">Segment 1: Upload Failed</option>
+                          <option value="NO_UPLOAD">Segment 2: Signed Up, No Upload</option>
+                          <option value="SUCCESSFUL_FREE">Segment 3: Successfully Used (Free)</option>
+                          <option value="PAID_USERS">Segment 4: Paid Users</option>
+                        </select>
+                      </div>
+                      
+                      <div className="glass rounded-xl flex flex-col px-3 py-1.5 border border-foreground/5">
+                        <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Subject</label>
+                        <input
+                          type="text"
+                          required
+                          value={campaignSubject}
+                          onChange={(e) => setCampaignSubject(e.target.value)}
+                          placeholder="Subject line..."
+                          className="bg-transparent text-[13px] font-semibold outline-none py-1 text-foreground placeholder:text-muted-foreground/30"
+                        />
+                      </div>
+                      
+                      <div className="glass rounded-xl flex flex-col px-3 py-1.5 border border-foreground/5">
+                        <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            checked={campaignGrantPro}
+                            onChange={(e) => setCampaignGrantPro(e.target.checked)}
+                          /> 
+                          <span className="text-emerald-400">Grant 3 Days Pro Access</span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="glass rounded-xl flex flex-col px-3 py-1.5 border border-foreground/5 relative">
+                      <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider flex justify-between">
+                        <span>Message Body</span>
+                        <span className="text-indigo-400 lowercase">Use {'{{FirstName}}'}</span>
+                      </label>
+                      <textarea
+                        required
+                        value={campaignBody}
+                        onChange={(e) => setCampaignBody(e.target.value)}
+                        placeholder="Type your message here..."
+                        className="bg-transparent text-[13px] font-semibold outline-none py-1 text-foreground placeholder:text-muted-foreground/30 flex-1 resize-none min-h-[150px]"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <p className="text-[12px] text-indigo-400 font-bold">{campaignMessage}</p>
+                    <button
+                      type="submit"
+                      disabled={campaignSending || !campaignSubject || !campaignBody}
+                      className="rounded-full bg-foreground px-6 py-2.5 text-[13px] font-bold text-background transition-transform active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {campaignSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      {campaignSending ? "Sending Segment..." : "Send Campaign"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
               {/* Comprehensive User Directory Table */}
               <div className="glass border border-foreground/5 rounded-[28px] p-5 space-y-4">
                 <h3 className="text-[16px] font-semibold tracking-tight flex items-center gap-2">
@@ -484,6 +719,7 @@ export default function AdminPage() {
                         <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Contact</th>
                         <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Statements</th>
                         <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Joined Date</th>
+                        <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Last Active</th>
                         <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider text-right">Action</th>
                       </tr>
                     </thead>
@@ -503,6 +739,19 @@ export default function AdminPage() {
                             </td>
                             <td className="py-3 px-4 text-[12px] text-muted-foreground">
                               {new Date(u.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="py-3 px-4 text-[12px] font-bold text-emerald-400">
+                              {u.last_active ? (
+                                (() => {
+                                  const now = new Date();
+                                  const active = new Date(u.last_active);
+                                  const diffMins = Math.floor((now.getTime() - active.getTime()) / 60000);
+                                  if (diffMins < 5) return 'Just now';
+                                  if (diffMins < 60) return `${diffMins}m ago`;
+                                  if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+                                  return active.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                })()
+                              ) : "Never"}
                             </td>
                             <td className="py-3 px-4 text-right">
                               <button
