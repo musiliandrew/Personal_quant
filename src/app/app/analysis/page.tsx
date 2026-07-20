@@ -408,11 +408,11 @@ export default function AnalysisPage() {
         ) : tab === "monthly" ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {monthly?.months.slice(0, isPro ? undefined : 1).map((m, i) => (
+              {monthly?.months.slice(0, isPro ? undefined : 3).map((m, i) => (
                 <MonthCard key={m.month_key} data={m} index={i} />
               ))}
             </div>
-            {isPro === false && monthly?.months && monthly.months.length > 1 && (
+            {isPro === false && monthly?.months && monthly.months.length > 3 && (
               <div className="relative mt-4 overflow-hidden rounded-[24px] border border-foreground/10 p-6 text-center bg-transparent glass flex flex-col items-center justify-center min-h-[220px]">
                 <div className="absolute inset-0 -z-10 bg-background/30 backdrop-blur-md" />
                 <div className="absolute inset-0 -z-20 bg-gradient-to-b from-transparent to-background/90" />
@@ -438,11 +438,11 @@ export default function AnalysisPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {weekly?.weeks.slice(0, isPro ? undefined : 1).map((w, i) => (
+              {weekly?.weeks.slice(0, isPro ? undefined : 4).map((w, i) => (
                 <WeekCard key={w.week_start} data={w} index={i} />
               ))}
             </div>
-            {isPro === false && weekly?.weeks && weekly.weeks.length > 1 && (
+            {isPro === false && weekly?.weeks && weekly.weeks.length > 4 && (
               <div className="relative mt-4 overflow-hidden rounded-[24px] border border-foreground/10 p-6 text-center bg-transparent glass flex flex-col items-center justify-center min-h-[220px]">
                 <div className="absolute inset-0 -z-10 bg-background/30 backdrop-blur-md" />
                 <div className="absolute inset-0 -z-20 bg-gradient-to-b from-transparent to-background/90" />
