@@ -213,6 +213,12 @@ export const api = {
     }
   },
 
+  async deleteStatement(id: string): Promise<void> {
+    await apiFetch(`/statements/${id}/`, {
+      method: "DELETE",
+    });
+  },
+
   async getStatements(): Promise<{ statements: Array<{
     id: string;
     provider: string;

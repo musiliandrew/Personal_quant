@@ -89,6 +89,35 @@ export default function ProfilePage() {
     }
   };
 
+  const [holdStatementId, setHoldStatementId] = useState<string | null>(null);
+  const [deletingStatementId, setDeletingStatementId] = useState<string | null>(null);
+  const statementHoldTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startStatementHold = (id: string) => {
+    statementHoldTimer.current = setTimeout(() => setHoldStatementId(id), 500);
+  };
+  const clearStatementHold = () => {
+    if (statementHoldTimer.current) clearTimeout(statementHoldTimer.current);
+  };
+  const cancelStatementHold = () => {
+    clearStatementHold();
+    setHoldStatementId(null);
+  };
+
+  const handleDeleteStatement = async (id: string) => {
+    setDeletingStatementId(id);
+    setHoldStatementId(null);
+    try {
+      await api.deleteStatement(id);
+      setStatements(prev => prev.filter(s => String(s.id) !== String(id)));
+      window.dispatchEvent(new Event("quant-statements-updated"));
+    } catch (err) {
+      console.error("Failed to delete statement", err);
+    } finally {
+      setDeletingStatementId(null);
+    }
+  };
+
   const filteredSuggestions = allMerchants
     .filter((m) => m.toLowerCase().includes(merchantName.toLowerCase()))
     .slice(0, 8);
@@ -296,10 +325,22 @@ export default function ProfilePage() {
                 };
                 const st = statusConfig[s.status as keyof typeof statusConfig] || statusConfig.PENDING;
 
+                const statementId = String(s.id);
+                const isHeld = holdStatementId === statementId;
+                const isDeleting = deletingStatementId === statementId;
+
                 return (
                   <div
                     key={s.id}
-                    className="flex items-start gap-3 p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] hover:bg-foreground/[0.04] transition-colors"
+                    className={`flex items-start gap-3 p-3 rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] hover:bg-foreground/[0.04] transition-colors relative overflow-hidden select-none ${
+                      isHeld ? "ring-2 ring-red-500/50 bg-red-500/5" : ""
+                    }`}
+                    onMouseDown={() => startStatementHold(statementId)}
+                    onMouseUp={clearStatementHold}
+                    onMouseLeave={cancelStatementHold}
+                    onTouchStart={() => startStatementHold(statementId)}
+                    onTouchEnd={clearStatementHold}
+                    onTouchCancel={cancelStatementHold}
                   >
                     <div className="h-8 w-8 rounded-xl bg-foreground/[0.04] flex items-center justify-center shrink-0">
                       <FileText className="h-4 w-4 text-muted-foreground" />
@@ -317,6 +358,24 @@ export default function ProfilePage() {
                         {s.transaction_count > 0 ? `${s.transaction_count} transactions · ` : ""}
                         {s.provider} · Uploaded {new Date(s.upload_date).toLocaleDateString("en-KE", { month: "short", day: "numeric", year: "numeric" })}
                       </p>
+                    </div>
+                    <div className="flex items-center shrink-0">
+                      <AnimatePresence>
+                        {isHeld && !isDeleting && (
+                          <motion.button
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteStatement(statementId); }}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-lg ml-2"
+                          >
+                            <Trash2 className="h-3 w-3" /> Delete
+                          </motion.button>
+                        )}
+                      </AnimatePresence>
+                      {isDeleting && (
+                        <div className="h-4 w-4 rounded-full border-2 border-red-400/30 border-t-red-400 animate-spin ml-2" />
+                      )}
                     </div>
                   </div>
                 );
