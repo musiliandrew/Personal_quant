@@ -81,7 +81,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
       return "This PDF file seems corrupted. Please request a fresh copy from Safaricom and try again.";
     }
     if (lowerMsg.includes("already been uploaded")) {
-      return "You've already uploaded this statement! Please upload a statement for a different time period.";
+      return "You've already uploaded this exact file! If you want to add more data, please upload a different M-Pesa statement PDF.";
     }
     return msg;
   };
