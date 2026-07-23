@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, ChevronDown } from "lucide-react";
+import { Sparkles, ChevronDown, Copy, Check } from "lucide-react";
 
 export type Msg = {
   role: "user" | "quant";
@@ -102,15 +102,30 @@ export function Bubble({ msg, onSelectQuestion }: { msg: Msg; onSelectQuestion?:
     }
   }
 
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(cleanText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="max-w-[90%] sm:max-w-[80%] space-y-2"
+      className="max-w-[90%] sm:max-w-[80%] space-y-2 group"
     >
-      <div className="glass rounded-[20px] rounded-bl-[4px] p-3.5 sm:p-4 border border-foreground/[0.04]">
-        <div className="leading-relaxed space-y-1">
+      <div className="glass rounded-[20px] rounded-bl-[4px] p-3.5 sm:p-4 border border-foreground/[0.04] relative">
+        <button
+          onClick={handleCopy}
+          className="absolute top-3 right-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-foreground/5 hover:bg-foreground/10 text-foreground/50 hover:text-foreground/80"
+          title="Copy response"
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+        </button>
+        <div className="leading-relaxed space-y-1 pr-6">
           {parseMarkdown(cleanText)}
         </div>
         {msg.confidence != null && (
