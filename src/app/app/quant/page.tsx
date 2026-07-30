@@ -53,14 +53,22 @@ function QuantPageContent() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setIsAutoSyncActive(localStorage.getItem("quant_autoforward_active") === "true");
+      const isConnectedParam = searchParams.get("gmail_connected") === "true";
+      if (isConnectedParam) {
+        localStorage.setItem("quant_autoforward_active", "true");
+        setIsAutoSyncActive(true);
+        setIsAutoForwardModalOpen(true);
+      } else {
+        setIsAutoSyncActive(localStorage.getItem("quant_autoforward_active") === "true");
+      }
+
       const handleSyncChange = (e: any) => {
         setIsAutoSyncActive(e.detail?.active ?? false);
       };
       window.addEventListener("quant-autoforward-changed", handleSyncChange);
       return () => window.removeEventListener("quant-autoforward-changed", handleSyncChange);
     }
-  }, []);
+  }, [searchParams]);
 
   // Desktop history sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
