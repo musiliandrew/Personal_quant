@@ -241,7 +241,7 @@ function QuantPageContent() {
           <div className="h-12 w-12 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
           <Sparkles className="absolute inset-0 m-auto h-5 w-5 text-purple-400 animate-pulse" />
         </div>
-        <p className="text-[12px] text-muted-foreground font-semibold animate-pulse">Syncing with your financial twin…</p>
+        <p className="text-[12px] text-muted-foreground font-semibold animate-pulse">Syncing with Your Auditor…</p>
       </div>
     );
   }

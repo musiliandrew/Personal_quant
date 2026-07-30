@@ -184,7 +184,7 @@ export default function Onboarding() {
                   <Cpu className="h-5 w-5 text-foreground relative z-10" strokeWidth={1.8} />
                 </div>
                 <h1 className="text-center text-[21px] md:text-[24px] font-semibold leading-tight tracking-tight">How it works.</h1>
-                <p className="mt-1.5 text-center text-[12.5px] text-muted-foreground font-semibold px-2">Building your private Financial Twin.</p>
+                <p className="mt-1.5 text-center text-[12.5px] text-muted-foreground font-semibold px-2">Activating Your Auditor.</p>
                 <div className="mt-4 relative border-l border-foreground/10 pl-5 ml-3 space-y-3.5">
                   {[
                     ["Set your Survival Pack", "Declare your fixed essential costs."],

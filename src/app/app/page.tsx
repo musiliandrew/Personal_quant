@@ -253,7 +253,7 @@ export default function HomePage() {
             )}
           </motion.div>
 
-          {/* Financial Twin Confidence Meter */}
+          {/* Quant Auditor Confidence Meter */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -262,7 +262,7 @@ export default function HomePage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Financial Twin</p>
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Your Auditor</p>
                 <p className="mt-0.5 text-[14px] sm:text-[16px] font-semibold">Your model is active</p>
               </div>
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-emerald-400">

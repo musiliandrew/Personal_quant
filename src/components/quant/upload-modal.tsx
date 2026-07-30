@@ -281,7 +281,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                       Sign Your Quant
                     </h2>
                     <p className="mt-1.5 text-[12.5px] text-muted-foreground font-semibold px-2 leading-relaxed">
-                      Upload your Safaricom M-Pesa statement PDF to generate your private financial twin and start goal optimization.
+                      Upload your Safaricom M-Pesa statement PDF to activate Your Auditor and start goal optimization.
                     </p>
 
                     {errorMsg && (

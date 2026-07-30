@@ -162,7 +162,7 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
                 </div>
                 <h2 className="text-[19px] xs:text-[23px] font-bold tracking-tight">Unlock Quant Pro</h2>
                 <p className="text-[12px] xs:text-[13px] text-muted-foreground font-semibold">
-                  Get full unrestricted access to your private financial twin.
+                  Get full unrestricted access to Your Auditor.
                 </p>
               </div>
 
