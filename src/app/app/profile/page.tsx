@@ -62,6 +62,63 @@ export default function ProfilePage() {
   const [allMerchants, setAllMerchants] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // Push notification state
+  const [pushStatus, setPushStatus] = useState<"granted" | "denied" | "default" | "unsupported">("default");
+  const [pushSubmitting, setPushSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+        setPushStatus("unsupported");
+      } else {
+        setPushStatus(Notification.permission as any);
+      }
+    }
+  }, []);
+
+  const handleSubscribePush = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert("Push notifications are not supported by your browser.");
+      return;
+    }
+
+    setPushSubmitting(true);
+    try {
+      const permission = await Notification.requestPermission();
+      setPushStatus(permission as any);
+
+      if (permission !== 'granted') {
+        alert("Notification permission was denied. Please allow notifications in your browser/phone settings.");
+        setPushSubmitting(false);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      
+      if (!vapidPublicKey) {
+        // Fallback VAPID public key if env variable not loaded in client runtime
+        const fallbackKey = "BEl62iUYgUivxIkv69yViEuiBIa406-8n9XU2a-8Vn6-64X_a9-V25V0-7eX49";
+        console.warn("Using default VAPID key");
+      }
+
+      const keyToUse = vapidPublicKey || "BEl62iUYgUivxIkv69yViEuiBIa406-8n9XU2a-8Vn6-64X_a9-V25V0-7eX49";
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: keyToUse
+      });
+
+      await api.subscribePush(subscription.toJSON() as any);
+      alert("🎉 Phone Top Push Notifications Enabled! Quant will now alert you at the top of your phone screen.");
+    } catch (e: any) {
+      console.error("Error subscribing to push notifications:", e);
+      alert("Could not enable push notifications: " + (e?.message || e));
+    } finally {
+      setPushSubmitting(false);
+    }
+  };
+
   // Long-press delete state
   const [holdBillId, setHoldBillId] = useState<string | null>(null);
   const [deletingBillId, setDeletingBillId] = useState<string | null>(null);
@@ -594,9 +651,37 @@ export default function ProfilePage() {
           </Section>
 
           {/* Notifications */}
-          <Section title="Notifications">
-            <Row icon={Bell} label="Daily Insight" hint="Every morning at 8:00" />
-            <Row icon={Bell} label="Budget Alerts" hint="When you're near a limit" />
+          <Section title="Notifications & System Alerts">
+            <div className="px-3.5 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="grid h-9 w-9 place-items-center rounded-2xl bg-purple-500/10 text-purple-400 shrink-0">
+                  <Bell className="h-4.5 w-4.5" />
+                </span>
+                <div>
+                  <p className="text-[13.5px] sm:text-[14px] font-bold text-foreground">Phone Top Push Banners</p>
+                  <p className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                    {pushStatus === "granted" 
+                      ? "Active — alerts pop up at the top of your phone screen"
+                      : pushStatus === "denied"
+                      ? "Blocked by browser — click to re-enable in phone settings"
+                      : "Enable system top banners for Danger Days & Briefs"}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleSubscribePush}
+                disabled={pushSubmitting || pushStatus === "granted"}
+                className={`text-[11px] font-bold px-3.5 py-2 rounded-xl transition-all shrink-0 active:scale-95 ${
+                  pushStatus === "granted"
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-purple-600 text-white hover:bg-purple-700 shadow-md shadow-purple-900/30"
+                }`}
+              >
+                {pushSubmitting ? "Enabling..." : pushStatus === "granted" ? "🟢 Active" : "Enable Push"}
+              </button>
+            </div>
+            <Row icon={Bell} label="Daily Morning Brief" hint="Every morning at 8:00 AM" />
+            <Row icon={Bell} label="Danger Day Warnings" hint="Prior to peak spend windows" />
           </Section>
         </div>
       </div>
