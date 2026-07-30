@@ -128,7 +128,7 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  🔐 Push Sync
+                  ✨ Direct Google Sync
                 </button>
                 <button
                   onClick={() => setActiveTab("manual")}
@@ -182,35 +182,35 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                 </div>
               )}
 
-              {/* Tab 2: Serverless Direct Push Sync */}
+              {/* Tab 2: Direct Google Account Sync */}
               {activeTab === "direct" && (
                 <div className="space-y-2 pt-0.5">
                   <p className="text-[11px] sm:text-[12px] text-muted-foreground font-semibold leading-relaxed">
-                    Connect your Google account for zero-touch serverless inbox sync via Google Cloud Pub/Sub:
+                    Connect your Gmail account so Quant automatically detects M-Pesa statements the second Safaricom sends them:
                   </p>
 
                   <div className="p-3 rounded-2xl bg-purple-500/5 border border-purple-500/15 space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <Lock className="h-3.5 w-3.5 text-purple-400" />
-                      <span className="text-[11.5px] font-extrabold text-foreground">Google Cloud Pub/Sub Webhook</span>
+                      <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+                      <span className="text-[11.5px] font-extrabold text-foreground">Automatic Google Account Integration</span>
                     </div>
 
                     <p className="text-[10.5px] text-muted-foreground font-medium leading-relaxed">
-                      Whenever Safaricom sends an e-statement, Google Cloud fires a serverless push notification to Quant.
+                      Instant zero-touch ingestion whenever a new e-statement arrives in your primary inbox.
                     </p>
 
                     <button
                       onClick={() => {
-                        alert("Google Sign-In Account connected! Serverless Pub/Sub active.");
+                        window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "https://api.quantiq.co.ke"}/api/notifications/gmail/auth/`;
                       }}
-                      className="w-full py-2 rounded-xl bg-purple-500 text-white font-bold text-[11.5px] hover:opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5"
+                      className="w-full py-2.5 rounded-xl bg-purple-600 text-white font-bold text-[11.5px] hover:bg-purple-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5"
                     >
-                      <Sparkles className="h-3.5 w-3.5" /> Direct Sync Active with Google Account
+                      <Lock className="h-3.5 w-3.5" /> Connect Gmail Account
                     </button>
                   </div>
 
                   <div className="p-2 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-[10px] text-amber-400 font-semibold leading-normal">
-                    💡 If Google displays an "Unverified App" warning, use the <strong>Gmail Rule</strong> tab — 0 permissions needed!
+                    💡 If Google displays an "Unverified App" warning during login, use the <strong>Gmail Rule</strong> tab — 0 permissions needed & 100% unblockable!
                   </div>
                 </div>
               )}
