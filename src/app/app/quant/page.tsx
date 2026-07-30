@@ -329,36 +329,36 @@ function QuantPageContent() {
       {/* ════════════════════════════════════════════════
           MOBILE LAYOUT  (hidden on md+)
       ═══════════════════════════════════════════════ */}
-      <div className="flex min-h-screen flex-col space-y-4 pt-2 relative md:hidden">
+      <div className="flex h-[calc(100dvh-115px)] flex-col rounded-3xl border border-foreground/[0.08] glass-strong overflow-hidden relative md:hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-foreground/[0.06] bg-background/40 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Logo size={36} className="text-foreground shrink-0" />
+            <Logo size={28} className="text-foreground shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-[20px] font-semibold tracking-tight truncate">Your Quant</h1>
-              <p className="text-[11px] text-muted-foreground font-semibold truncate">Your private financial analyst</p>
+              <h1 className="text-[15px] font-bold tracking-tight truncate text-foreground">Your Quant</h1>
+              <p className="text-[10px] text-muted-foreground font-semibold truncate">Your Auditor</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={startNewChat}
-              className="glass grid h-8.5 w-8.5 place-items-center rounded-full hover:bg-foreground/[0.04]"
+              className="glass grid h-8 w-8 place-items-center rounded-full hover:bg-foreground/[0.04]"
               title="New Chat"
             >
-              <Plus className="h-4.5 w-4.5 text-muted-foreground" />
+              <Plus className="h-4 w-4 text-muted-foreground" />
             </button>
             <button
               onClick={() => { fetchConversations(); setIsDrawerOpen(true); }}
-              className="glass grid h-8.5 w-8.5 place-items-center rounded-full hover:bg-foreground/[0.04]"
+              className="glass grid h-8 w-8 place-items-center rounded-full hover:bg-foreground/[0.04]"
               title="Chat History"
             >
-              <History className="h-4.5 w-4.5 text-muted-foreground" />
+              <History className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="mt-4 flex-1 space-y-3 pb-40">
+        {/* Messages Feed */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 [scrollbar-width:none]">
           {historyLoading ? (
             <div className="py-20 text-center space-y-3">
               <div className="h-6 w-6 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin mx-auto" />
@@ -368,7 +368,7 @@ function QuantPageContent() {
             <AnimatePresence initial={false}>
               {msgs.map((m, i) => <Bubble key={i} msg={m} onSelectQuestion={(q) => send(q)} />)}
               {sending && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} className="text-[11px] text-muted-foreground italic pl-4">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} className="text-[11px] text-muted-foreground italic pl-2">
                   Quant is thinking…
                 </motion.div>
               )}
@@ -376,8 +376,8 @@ function QuantPageContent() {
           )}
         </div>
 
-        {/* Mobile Composer — fixed */}
-        <div className="fixed inset-x-0 bottom-20 z-40 mx-auto max-w-md px-5">
+        {/* Mobile Composer — Anchored cleanly inside card bottom */}
+        <div className="shrink-0 p-3 border-t border-foreground/[0.06] bg-background/60 backdrop-blur-xl">
           {ComposerBlock}
         </div>
 
