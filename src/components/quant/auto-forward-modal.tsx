@@ -200,8 +200,31 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                     </p>
 
                     <button
-                      onClick={() => {
-                        window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "https://api.quantiq.co.ke"}/api/notifications/gmail/auth/`;
+                      onClick={async () => {
+                        try {
+                          const host = window.location.hostname;
+                          let apiBase = "http://localhost:8000";
+                          if (host.includes("quantiq.co.ke") || host.includes("vercel.app")) {
+                            apiBase = "https://api.quantiq.co.ke";
+                          } else if (host !== "localhost") {
+                            apiBase = `http://${host}:8000`;
+                          }
+                          
+                          const res = await fetch(`${apiBase}/api/notifications/gmail/auth/`);
+                          if (res.redirected) {
+                            window.location.href = res.url;
+                            return;
+                          }
+                          const data = await res.json();
+                          if (data.status === "config_required") {
+                            alert(data.message);
+                            setActiveTab("gmail");
+                          } else {
+                            window.location.href = `${apiBase}/api/notifications/gmail/auth/`;
+                          }
+                        } catch (e) {
+                          setActiveTab("gmail");
+                        }
                       }}
                       className="w-full py-2.5 rounded-xl bg-purple-600 text-white font-bold text-[11.5px] hover:bg-purple-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5"
                     >
