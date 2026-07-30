@@ -47,27 +47,12 @@ export function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const [latestToastNotif, setLatestToastNotif] = useState<Notif | null>(null);
-
   const fetch = async () => {
     try {
       setLoading(true);
       const res = await api.getNotifications();
-      const list: Notif[] = res.notifications || [];
-      const unreadCnt: number = res.unread_count || 0;
-      setNotifs(list);
-      setUnread(unreadCnt);
-
-      // Auto-trigger toast popup for the most recent unread notification if not dismissed yet
-      if (unreadCnt > 0 && list.length > 0) {
-        const firstUnread = list.find((n) => !n.is_read);
-        if (firstUnread) {
-          const dismissedId = sessionStorage.getItem(`quant_dismissed_notif_${firstUnread.id}`);
-          if (!dismissedId) {
-            setLatestToastNotif(firstUnread);
-          }
-        }
-      }
+      setNotifs(res.notifications || []);
+      setUnread(res.unread_count || 0);
     } catch (_) {}
     finally { setLoading(false); }
   };
@@ -256,35 +241,6 @@ export function NotificationBell() {
                 )}
               </AnimatePresence>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Floating Interactive Toast Notification Banner */}
-      <AnimatePresence>
-        {latestToastNotif && !open && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-4 right-4 z-50 max-w-sm w-full p-4 rounded-2xl glass-strong border border-purple-500/30 shadow-[0_12px_36px_rgba(0,0,0,0.3)] flex items-start gap-3 backdrop-blur-xl"
-          >
-            <div className="h-9 w-9 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center shrink-0">
-              <Bell className="h-4.5 w-4.5" />
-            </div>
-            <div className="flex-1 min-w-0 pr-2">
-              <p className="text-[13px] font-black text-foreground tracking-tight">{latestToastNotif.title}</p>
-              <p className="text-[11.5px] text-muted-foreground font-semibold leading-relaxed mt-0.5">{latestToastNotif.body}</p>
-            </div>
-            <button
-              onClick={() => {
-                sessionStorage.setItem(`quant_dismissed_notif_${latestToastNotif.id}`, "1");
-                setLatestToastNotif(null);
-              }}
-              className="p-1 rounded-lg bg-foreground/[0.05] hover:bg-foreground/10 text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
           </motion.div>
         )}
       </AnimatePresence>
