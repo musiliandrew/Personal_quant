@@ -267,6 +267,44 @@ export default function ProfilePage() {
 
       <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} onSuccess={() => { setShowUpgrade(false); window.location.reload(); }} />
 
+      {/* ── Email Auto-Forwarding Banner ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="glass rounded-[22px] sm:rounded-3xl p-4 sm:p-5 border border-purple-500/20 bg-purple-500/5 relative overflow-hidden"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse" />
+              <h3 className="text-[13px] sm:text-[14px] font-black tracking-tight text-foreground">
+                Email Auto-Forwarding
+              </h3>
+              <span className="text-[9px] font-extrabold uppercase tracking-wider bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full">
+                Zero Friction
+              </span>
+            </div>
+            <p className="text-[11px] sm:text-[12px] text-muted-foreground font-medium leading-relaxed">
+              Forward your M-Pesa or Bank e-statements directly to your Quant ingestion address:
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-2 p-2.5 rounded-xl bg-background/80 border border-foreground/10">
+          <code className="text-[12px] font-bold text-purple-400 select-all">audit@quantiq.co.ke</code>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText("audit@quantiq.co.ke");
+              alert("Copied audit@quantiq.co.ke to clipboard!");
+            }}
+            className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-purple-500 text-white hover:opacity-90 active:scale-95 transition-all shrink-0"
+          >
+            Copy Address
+          </button>
+        </div>
+      </motion.div>
+
       {/* ── Statements Card (mobile-first; desktop has it in sidebar) ── */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}

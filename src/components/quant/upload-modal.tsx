@@ -301,27 +301,56 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                         const file = e.dataTransfer.files?.[0];
                         if (file) handleFileUpload(file);
                       }}
-                      className={`glass mt-5 w-full rounded-[24px] p-6 text-center border border-dashed border-foreground/15 transition-all ${dragging ? "scale-[1.02] ring-2 ring-foreground/20" : ""}`}
+                      className={`glass mt-4 w-full rounded-[24px] p-5 text-center border border-dashed border-foreground/15 transition-all ${dragging ? "scale-[1.02] ring-2 ring-foreground/20" : ""}`}
                     >
                       <motion.div
                         animate={{ y: [0, -4, 0] }}
                         transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                        className="mx-auto grid h-12 w-12 place-items-center rounded-xl text-foreground shrink-0"
+                        className="mx-auto grid h-10 w-10 place-items-center rounded-xl text-foreground shrink-0"
                         style={{ background: "var(--gradient-sky)" }}
                       >
                         <FileUp className="h-5 w-5" strokeWidth={1.8} />
                       </motion.div>
-                      <p className="mt-3.5 text-[13.5px] font-bold">Drop M-Pesa PDF</p>
-                      <p className="mt-0.5 text-[11px] text-muted-foreground font-semibold">or</p>
+                      <p className="mt-2.5 text-[13px] font-bold">Drop M-Pesa PDF</p>
+                      <p className="mt-0.5 text-[10.5px] text-muted-foreground font-semibold">or</p>
                       <button
                         onClick={triggerPicker}
-                        className="mt-2.5 rounded-full bg-foreground px-5 py-2 text-[11.5px] font-bold text-background active:scale-95 transition-transform"
+                        className="mt-2 rounded-full bg-foreground px-5 py-2 text-[11px] font-bold text-background active:scale-95 transition-transform"
                       >
                         Select File
                       </button>
                     </div>
 
-                    <div className="mt-5 rounded-2xl bg-foreground/[0.02] p-3 border border-foreground/[0.04] text-[10.5px] leading-relaxed text-muted-foreground font-semibold flex gap-2.5 items-start text-left">
+                    {/* Email Auto-Forward Option */}
+                    <div className="mt-4 w-full rounded-2xl bg-purple-500/5 border border-purple-500/15 p-3.5 text-left space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse" />
+                          <span className="text-[11.5px] font-bold text-foreground">Email Auto-Forwarding</span>
+                        </div>
+                        <span className="text-[9px] uppercase tracking-wider font-extrabold bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full">
+                          Zero Upload
+                        </span>
+                      </div>
+                      <p className="text-[10.5px] text-muted-foreground font-semibold leading-relaxed">
+                        Skip manual uploads! Simply forward your M-Pesa or Bank statement PDF from your email to:
+                      </p>
+                      <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-background/80 border border-foreground/10">
+                        <code className="text-[11px] font-bold text-purple-400 select-all">audit@quantiq.co.ke</code>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText("audit@quantiq.co.ke");
+                            alert("Copied audit@quantiq.co.ke to clipboard!");
+                          }}
+                          className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-purple-500 text-white hover:opacity-90 active:scale-95 transition-all shrink-0"
+                        >
+                          Copy Address
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 rounded-2xl bg-foreground/[0.02] p-3 border border-foreground/[0.04] text-[10.5px] leading-relaxed text-muted-foreground font-semibold flex gap-2.5 items-start text-left">
                       <FileText className="h-4 w-4 text-foreground/65 shrink-0 mt-0.5" />
                       <p>Your M-Pesa statements are parsed securely. Quant maps income, rent, savings, and goals automatically.</p>
                     </div>
