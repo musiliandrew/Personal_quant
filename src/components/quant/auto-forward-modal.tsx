@@ -205,12 +205,18 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                           const host = window.location.hostname;
                           let apiBase = "http://localhost:8000";
                           if (host.includes("quantiq.co.ke") || host.includes("vercel.app")) {
-                            apiBase = "https://api.quantiq.co.ke";
+                            apiBase = "https://quant-backend-716792853258.us-central1.run.app";
                           } else if (host !== "localhost") {
                             apiBase = `http://${host}:8000`;
                           }
                           
-                          const res = await fetch(`${apiBase}/api/notifications/gmail/auth/`);
+                          let targetUrl = `${apiBase}/notifications/gmail/auth/`;
+                          let res = await fetch(targetUrl);
+                          if (!res.ok) {
+                            targetUrl = `${apiBase}/api/notifications/gmail/auth/`;
+                            res = await fetch(targetUrl);
+                          }
+                          
                           if (res.redirected) {
                             window.location.href = res.url;
                             return;
@@ -220,7 +226,7 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                             alert(data.message);
                             setActiveTab("gmail");
                           } else {
-                            window.location.href = `${apiBase}/api/notifications/gmail/auth/`;
+                            window.location.href = targetUrl;
                           }
                         } catch (e) {
                           setActiveTab("gmail");
