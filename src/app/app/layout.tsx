@@ -255,37 +255,39 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0">
-        {/* Mobile Sticky Header (Hidden on Desktop) */}
-        <div 
-          className="sticky top-0 z-30 backdrop-blur-md pt-7 pb-3.5 px-4 border-b border-foreground/[0.04] mb-3 md:hidden"
-          style={{ backgroundColor: "color-mix(in oklab, var(--background) 35%, transparent)" }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[11px] sm:text-[13px] text-muted-foreground font-semibold">{greeting}</p>
-              <div className="flex items-center gap-2">
-                <h1 className="text-[24px] sm:text-[28px] font-semibold tracking-tight">{userName}</h1>
-                {isPro !== null && (
-                  <span className={cn(
-                    "text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 mt-1",
-                    isPro 
-                      ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
-                      : "bg-foreground/10 text-muted-foreground"
-                  )}>
-                    {isPro ? "Pro" : "Free"}
-                  </span>
-                )}
+        {/* Mobile Sticky Header (Hidden on Desktop & Quant Page) */}
+        {pathname !== "/app/quant" && (
+          <div 
+            className="sticky top-0 z-30 backdrop-blur-md pt-7 pb-3.5 px-4 border-b border-foreground/[0.04] mb-3 md:hidden"
+            style={{ backgroundColor: "color-mix(in oklab, var(--background) 35%, transparent)" }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] sm:text-[13px] text-muted-foreground font-semibold">{greeting}</p>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-[24px] sm:text-[28px] font-semibold tracking-tight">{userName}</h1>
+                  {isPro !== null && (
+                    <span className={cn(
+                      "text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 mt-1",
+                      isPro 
+                        ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
+                        : "bg-foreground/10 text-muted-foreground"
+                    )}>
+                      {isPro ? "Pro" : "Free"}
+                    </span>
+                  )}
+                </div>
               </div>
+              <NotificationBell />
             </div>
-            <NotificationBell />
           </div>
-        </div>
+        )}
 
         {/* Dynamic Responsive wrapper for page content */}
         <div className={cn(
           "w-full",
           pathname === "/app/quant"
-            ? "mx-auto max-w-md md:max-w-5xl px-4 py-4 pb-32 md:px-6 md:py-6 md:pb-6"
+            ? "w-full h-[calc(100dvh-60px)] md:h-screen p-0 m-0 max-w-none"
             : "mx-auto max-w-md md:max-w-4xl lg:max-w-5xl px-4 py-4 md:px-8 md:py-10 pb-32 md:pb-16"
         )}>
           {/* Desktop header greeting — hidden on quant chat page */}

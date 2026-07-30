@@ -1,4 +1,4 @@
-const CACHE_NAME = "quant-cache-v6";
+const CACHE_NAME = "quant-cache-v7";
 const ASSETS_TO_CACHE = [
   "/",
   "/upload",

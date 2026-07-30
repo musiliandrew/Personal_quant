@@ -329,7 +329,7 @@ function QuantPageContent() {
       {/* ════════════════════════════════════════════════
           MOBILE LAYOUT  (hidden on md+)
       ═══════════════════════════════════════════════ */}
-      <div className="flex h-[calc(100dvh-115px)] flex-col rounded-3xl border border-foreground/[0.08] glass-strong overflow-hidden relative md:hidden">
+      <div className="flex h-full flex-col w-full bg-background overflow-hidden relative md:hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-foreground/[0.06] bg-background/40 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -395,7 +395,7 @@ function QuantPageContent() {
       {/* ════════════════════════════════════════════════
           DESKTOP LAYOUT  (hidden on mobile)
       ═══════════════════════════════════════════════ */}
-      <div className="hidden md:flex h-[calc(100vh-120px)] gap-0 overflow-hidden rounded-3xl border border-foreground/[0.06] shadow-[0_8px_40px_-8px_rgba(0,0,0,0.25)]">
+      <div className="hidden md:flex h-full w-full gap-0 overflow-hidden bg-background">
 
         {/* ── Left Panel: History Sidebar ──────────────── */}
         <AnimatePresence initial={false}>
