@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { Bubble, type Msg } from "@/components/chat/Bubble";
 import { HistoryDrawer } from "@/components/chat/HistoryDrawer";
 import UpgradeModal from "@/components/UpgradeModal";
+import { AutoForwardGuideModal } from "@/components/quant/auto-forward-modal";
 import { Logo } from "@/components/quant/logo";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,21 @@ function QuantPageContent() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Auto-sync status state
+  const [isAutoSyncActive, setIsAutoSyncActive] = useState<boolean>(false);
+  const [isAutoForwardModalOpen, setIsAutoForwardModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsAutoSyncActive(localStorage.getItem("quant_autoforward_active") === "true");
+      const handleSyncChange = (e: any) => {
+        setIsAutoSyncActive(e.detail?.active ?? false);
+      };
+      window.addEventListener("quant-autoforward-changed", handleSyncChange);
+      return () => window.removeEventListener("quant-autoforward-changed", handleSyncChange);
+    }
+  }, []);
 
   // Desktop history sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -335,7 +351,19 @@ function QuantPageContent() {
           <div className="flex items-center gap-2.5 min-w-0">
             <Logo size={28} className="text-foreground shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-[15px] font-bold tracking-tight truncate text-foreground">Your Quant</h1>
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-[15px] font-bold tracking-tight truncate text-foreground">Your Quant</h1>
+                <button
+                  onClick={() => setIsAutoForwardModalOpen(true)}
+                  className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border transition-all active:scale-95 shrink-0 ${
+                    isAutoSyncActive
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  }`}
+                >
+                  {isAutoSyncActive ? "🟢 Auto ON" : "🟡 Auto OFF"}
+                </button>
+              </div>
               <p className="text-[10px] text-muted-foreground font-semibold truncate">Your Auditor</p>
             </div>
           </div>
@@ -542,6 +570,11 @@ function QuantPageContent() {
         isOpen={isUpgradeOpen}
         onClose={() => setIsUpgradeOpen(false)}
         onSuccess={() => setIsPro(true)}
+      />
+
+      <AutoForwardGuideModal
+        isOpen={isAutoForwardModalOpen}
+        onClose={() => setIsAutoForwardModalOpen(false)}
       />
     </>
   );

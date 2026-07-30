@@ -14,6 +14,21 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
   const [copiedSafaricom, setCopiedSafaricom] = useState(false);
   const [activeTab, setActiveTab] = useState<"gmail" | "direct" | "manual">("gmail");
 
+  const [isAutoSyncActive, setIsAutoSyncActive] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("quant_autoforward_active") === "true";
+    }
+    return false;
+  });
+
+  const toggleAutoSyncStatus = (active: boolean) => {
+    setIsAutoSyncActive(active);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("quant_autoforward_active", String(active));
+      window.dispatchEvent(new CustomEvent("quant-autoforward-changed", { detail: { active } }));
+    }
+  };
+
   const copyText = (text: string, type: "audit" | "safaricom") => {
     navigator.clipboard.writeText(text);
     if (type === "audit") {
@@ -77,6 +92,37 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
 
             {/* Scrollable Content */}
             <div className="flex-1 min-h-0 overflow-y-auto pr-0.5 space-y-3 [scrollbar-width:none]">
+              
+              {/* Live Status Indicator Banner */}
+              <div className={`p-3 rounded-2xl border flex items-center justify-between transition-all ${
+                isAutoSyncActive
+                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                  : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+              }`}>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className={`h-2.5 w-2.5 rounded-full shrink-0 animate-pulse ${
+                    isAutoSyncActive ? "bg-emerald-400" : "bg-amber-400"
+                  }`} />
+                  <div className="min-w-0">
+                    <span className="text-[11.5px] font-extrabold block tracking-tight">
+                      {isAutoSyncActive ? "Auto-Forwarding Active 🟢" : "Auto-Sync Not Active 🟡"}
+                    </span>
+                    <span className="text-[10px] opacity-80 block truncate font-medium">
+                      {isAutoSyncActive ? "Safaricom statements auto-ingesting via audit@quantiq.co.ke" : "Setup 1-tap Gmail rule below to auto-sync"}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => toggleAutoSyncStatus(!isAutoSyncActive)}
+                  className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0 transition-all active:scale-95 ${
+                    isAutoSyncActive
+                      ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                      : "bg-amber-500 text-black hover:bg-amber-400"
+                  }`}
+                >
+                  {isAutoSyncActive ? "Active" : "Mark Active"}
+                </button>
+              </div>
               {/* Quick Addresses */}
               <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
                 <div className="p-2.5 sm:p-3 rounded-2xl bg-purple-500/5 border border-purple-500/15 space-y-0.5">
