@@ -206,8 +206,8 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                     </button>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-[10.5px] text-amber-400 font-semibold leading-relaxed">
-                    💡 <strong>Note on Permissions:</strong> If Google displays an "Unverified App" warning during OAuth login, you can safely use the <strong>Gmail Auto-Rule</strong> tab above — it requires 0 permissions and works 100% guaranteed!
+                  <div className="p-2.5 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-[10.5px] text-amber-400 font-semibold leading-normal">
+                    💡 If Google shows an "Unverified App" prompt, use the <strong>Gmail Rule</strong> tab — 0 permissions needed!
                   </div>
                 </div>
               )}
