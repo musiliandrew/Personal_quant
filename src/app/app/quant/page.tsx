@@ -139,13 +139,21 @@ function QuantPageContent() {
         } catch (_) {}
 
         const q = searchParams.get("q");
+        const cid = searchParams.get("cid");
 
-        if (convs && convs.length > 0) {
-          const latestId = convs[0].conversation_id;
-          await loadConversation(latestId);
-          if (q) send(q, latestId);
+        if (cid && convs && convs.length > 0) {
+          const match = convs.find((c: any) => c.conversation_id === cid);
+          if (match) {
+            await loadConversation(match.conversation_id);
+            if (q) send(q, match.conversation_id);
+          } else {
+            setMsgs(getInitialMsgs(name, hasData, txDays));
+            if (q) send(q, null);
+          }
         } else {
+          // Default: Start a fresh new chat session on navigating to Quant Auditor
           setMsgs(getInitialMsgs(name, hasData, txDays));
+          setConversationId(null);
           if (q) send(q, null);
         }
       } catch (err) {
@@ -170,7 +178,8 @@ function QuantPageContent() {
   }, [msgs]);
 
   const startNewChat = () => {
-    // Re-read data status from cache for new chat greeting
+    setSending(false);
+    setHistoryLoading(false);
     let hasData = false;
     try {
       const cached = localStorage.getItem("quant_dashboard");
@@ -183,7 +192,13 @@ function QuantPageContent() {
     } catch (_) {}
     setMsgs(getInitialMsgs(userName, hasData, hasData ? 90 : 0));
     setConversationId(null);
+    setInput("");
     setIsDrawerOpen(false);
+    setTimeout(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }, 50);
   };
 
   const send = async (text: string, overrideConversationId?: string | null) => {
