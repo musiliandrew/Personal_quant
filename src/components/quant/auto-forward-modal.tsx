@@ -190,9 +190,14 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                   </p>
 
                   <div className="p-3 rounded-2xl bg-purple-500/5 border border-purple-500/15 space-y-2.5">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-3.5 w-3.5 text-purple-400" />
-                      <span className="text-[11.5px] font-extrabold text-foreground">Automatic Google Account Integration</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+                        <span className="text-[11.5px] font-extrabold text-foreground">Automatic Google Account Integration</span>
+                      </div>
+                      <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 shrink-0">
+                        Beta Test
+                      </span>
                     </div>
 
                     <p className="text-[10.5px] text-muted-foreground font-medium leading-relaxed">
@@ -212,12 +217,15 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                       }}
                       className="w-full py-2.5 rounded-xl bg-purple-600 text-white font-bold text-[11.5px] hover:bg-purple-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5"
                     >
-                      <Lock className="h-3.5 w-3.5" /> Connect Gmail Account
+                      <Lock className="h-3.5 w-3.5" /> Connect Gmail Account (Beta)
                     </button>
                   </div>
 
-                  <div className="p-2 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-[10px] text-amber-400 font-semibold leading-normal">
-                    💡 If Google displays an "Unverified App" warning during login, use the <strong>Gmail Rule</strong> tab — 0 permissions needed & 100% unblockable!
+                  <div className="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[10.5px] text-amber-400 font-semibold leading-normal flex items-start gap-2">
+                    <span className="shrink-0 font-bold">🧪 Beta Notice:</span>
+                    <span>
+                      Google Direct Sync is currently in <strong>Beta Test</strong>. If authorization fails or Google shows an "Unverified App" prompt, use the <strong>Gmail Rule (Tab 1)</strong> — zero permissions needed & 100% unblockable!
+                    </span>
                   </div>
                 </div>
               )}
