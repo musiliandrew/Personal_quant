@@ -204,21 +204,17 @@ export function AutoForwardGuideModal({ isOpen, onClose }: AutoForwardGuideModal
                       Instant zero-touch ingestion whenever a new e-statement arrives in your primary inbox.
                     </p>
 
-                    <button
-                      onClick={() => {
-                        const host = typeof window !== "undefined" ? window.location.hostname : "";
-                        let apiBase = "http://localhost:8000";
-                        if (host.includes("quantiq.co.ke") || host.includes("vercel.app")) {
-                          apiBase = "https://quant-backend-716792853258.us-central1.run.app";
-                        } else if (host && host !== "localhost") {
-                          apiBase = `http://${host}:8000`;
-                        }
-                        window.location.href = `${apiBase}/notifications/gmail/auth/`;
-                      }}
-                      className="w-full py-2.5 rounded-xl bg-purple-600 text-white font-bold text-[11.5px] hover:bg-purple-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5"
+                    <a
+                      href={
+                        typeof window !== "undefined" && (window.location.hostname.includes("quantiq.co.ke") || window.location.hostname.includes("vercel.app"))
+                          ? "https://quant-backend-716792853258.us-central1.run.app/notifications/gmail/auth/"
+                          : "http://localhost:8000/notifications/gmail/auth/"
+                      }
+                      target="_self"
+                      className="w-full py-2.5 rounded-xl bg-purple-600 text-white font-bold text-[11.5px] hover:bg-purple-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer text-center"
                     >
                       <Lock className="h-3.5 w-3.5" /> Connect Gmail Account (Beta)
-                    </button>
+                    </a>
                   </div>
 
                   <div className="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[10.5px] text-amber-400 font-semibold leading-normal flex items-start gap-2">
