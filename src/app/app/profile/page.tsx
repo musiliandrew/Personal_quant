@@ -23,6 +23,7 @@ import {
 import { api } from "@/lib/api";
 import { useTheme } from "@/components/ThemeProvider";
 import UpgradeModal from "@/components/UpgradeModal";
+import { AutoForwardGuideModal } from "@/components/quant/auto-forward-modal";
 
 const currency = (n: number) => `KSh ${n.toLocaleString("en-KE", { maximumFractionDigits: 0 })}`;
 
@@ -30,6 +31,7 @@ export default function ProfilePage() {
   const { isDark: dark, setDark } = useTheme();
   const [isBillsOpen, setIsBillsOpen] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
   const [bills, setBills] = useState<any[]>([]);
   const [loadingBills, setLoadingBills] = useState(true);
   
@@ -286,9 +288,15 @@ export default function ProfilePage() {
               </span>
             </div>
             <p className="text-[11px] sm:text-[12px] text-muted-foreground font-medium leading-relaxed">
-              Forward your M-Pesa or Bank e-statements directly to your Quant ingestion address:
+              Forward your M-Pesa e-statements directly to Quant for automated processing:
             </p>
           </div>
+          <button
+            onClick={() => setShowGuideModal(true)}
+            className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20 shrink-0 transition-colors"
+          >
+            How to Setup ➔
+          </button>
         </div>
 
         <div className="mt-3 flex items-center justify-between gap-2 p-2.5 rounded-xl bg-background/80 border border-foreground/10">
@@ -304,6 +312,8 @@ export default function ProfilePage() {
           </button>
         </div>
       </motion.div>
+
+      <AutoForwardGuideModal isOpen={showGuideModal} onClose={() => setShowGuideModal(false)} />
 
       {/* ── Statements Card (mobile-first; desktop has it in sidebar) ── */}
       <motion.div

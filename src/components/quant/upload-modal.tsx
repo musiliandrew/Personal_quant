@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { X, FileUp, FileText, Check, Sparkles, ShieldCheck, Lock } from "lucide-react";
+import { X, FileUp, FileText, Check, Sparkles, ShieldCheck, Lock, HelpCircle } from "lucide-react";
 import { api } from "@/lib/api";
+import { AutoForwardGuideModal } from "./auto-forward-modal";
 
 const steps = [
   "Reading M-Pesa statement…",
@@ -31,6 +32,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
   const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
   const [pdfPassword, setPdfPassword] = useState("");
   const [isIncorrectPassword, setIsIncorrectPassword] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   // Parsing step loop animation
   useEffect(() => {
@@ -328,12 +330,16 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                           <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse" />
                           <span className="text-[11.5px] font-bold text-foreground">Email Auto-Forwarding</span>
                         </div>
-                        <span className="text-[9px] uppercase tracking-wider font-extrabold bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full">
-                          Zero Upload
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowGuideModal(true)}
+                          className="text-[9px] font-extrabold bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/20 transition-colors flex items-center gap-1"
+                        >
+                          <HelpCircle className="h-2.5 w-2.5" /> Setup Guide
+                        </button>
                       </div>
                       <p className="text-[10.5px] text-muted-foreground font-semibold leading-relaxed">
-                        Skip manual uploads! Simply forward your M-Pesa or Bank statement PDF from your email to:
+                        Forward your M-Pesa statements directly from your email to:
                       </p>
                       <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-background/80 border border-foreground/10">
                         <code className="text-[11px] font-bold text-purple-400 select-all">audit@quantiq.co.ke</code>
@@ -349,6 +355,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                         </button>
                       </div>
                     </div>
+
+                    <AutoForwardGuideModal isOpen={showGuideModal} onClose={() => setShowGuideModal(false)} />
 
                     <div className="mt-3 rounded-2xl bg-foreground/[0.02] p-3 border border-foreground/[0.04] text-[10.5px] leading-relaxed text-muted-foreground font-semibold flex gap-2.5 items-start text-left">
                       <FileText className="h-4 w-4 text-foreground/65 shrink-0 mt-0.5" />
