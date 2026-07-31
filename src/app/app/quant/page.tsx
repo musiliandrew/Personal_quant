@@ -353,7 +353,7 @@ function QuantPageContent() {
       {/* ════════════════════════════════════════════════
           MOBILE LAYOUT  (hidden on md+)
       ═══════════════════════════════════════════════ */}
-      <div className="flex h-full flex-col w-full bg-background overflow-hidden relative md:hidden">
+      <div className="flex flex-1 min-h-0 flex-col w-full bg-background overflow-hidden relative md:hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-foreground/[0.06] bg-background/40 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
