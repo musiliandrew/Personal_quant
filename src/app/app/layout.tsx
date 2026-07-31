@@ -288,7 +288,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className={cn(
           "w-full",
           pathname === "/app/quant"
-            ? "w-full h-[calc(100dvh-120px)] md:h-[calc(100vh-100px)] p-0 m-0 max-w-none"
+            ? "w-full h-[calc(100dvh-75px)] md:h-[calc(100vh-80px)] p-0 m-0 max-w-none"
             : "mx-auto max-w-md md:max-w-4xl lg:max-w-5xl px-4 py-4 md:px-8 md:py-10 pb-32 md:pb-16"
         )}>
           {/* Desktop header greeting */}

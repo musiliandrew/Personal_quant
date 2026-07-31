@@ -412,8 +412,8 @@ function QuantPageContent() {
           )}
         </div>
 
-        {/* Mobile Composer — Anchored cleanly inside card bottom */}
-        <div className="shrink-0 p-3 border-t border-foreground/[0.06] bg-background/60 backdrop-blur-xl">
+        {/* Mobile Composer — Anchored cleanly inside card bottom above bottom nav */}
+        <div className="shrink-0 p-3 pb-20 md:pb-3 border-t border-purple-500/20 bg-background/95 backdrop-blur-2xl z-20">
           {ComposerBlock}
         </div>
 
