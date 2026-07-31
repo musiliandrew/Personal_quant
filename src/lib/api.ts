@@ -219,6 +219,13 @@ export const api = {
     });
   },
 
+  async unlockStatement(id: string, password: string): Promise<any> {
+    return await apiFetch(`/statements/${id}/unlock/`, {
+      method: "POST",
+      body: JSON.stringify({ password }),
+    });
+  },
+
   async getStatements(): Promise<{ statements: Array<{
     id: string;
     provider: string;

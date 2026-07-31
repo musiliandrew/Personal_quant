@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { UploadModal } from "@/components/quant/upload-modal";
+import { PendingPasswordBanner } from "@/components/quant/PendingPasswordBanner";
 
 type NavItem = { to: "/app" | "/app/goals" | "/app/quant" | "/app/profile" | "/app/analysis"; label: string; icon: typeof Home; exact?: boolean };
 const items: NavItem[] = [
@@ -308,6 +309,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </div>
+          </div>
+
+          {/* Dynamic Passcode Alert Banner for encrypted statements */}
+          <div className="px-4 sm:px-0">
+            <PendingPasswordBanner />
           </div>
 
           {children}
